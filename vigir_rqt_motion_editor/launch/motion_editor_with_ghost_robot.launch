@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="robot_model" default="$(find atlas)/atlas.urdf"/>
+  <param name="robot_description" textfile="$(arg robot_model)" />
+  <param name="use_gui" value="True"/>
+
+  <node name="motion_editor" pkg="vigir_rqt_motion_editor" type="motion_editor" respawn="true" args="-c">
+    <!--<param name="incoming_joint_states_topic_name" value="/ghost/joint_states"/>-->
+    <!-- currently remapping does not work with rqt: https://github.com/ros-visualization/rqt/pull/76
+    <remap from="/flor/torso_controller/trajectory" to="/flor/torso_controller/trajectory" />
+    <remap from="/flor/head_controller/trajectory" to="/flor/head_controller/trajectory" />
+    <remap from="/flor/l_arm_controller/trajectory" to="/flor/l_arm_controller/trajectory" />
+    <remap from="/flor/l_leg_controller/trajectory" to="/flor/l_leg_controller/trajectory" />
+    <remap from="/flor/r_arm_controller/trajectory" to="/flor/r_arm_controller/trajectory" />
+    <remap from="/flor/r_leg_controller/trajectory" to="/flor/r_leg_controller/trajectory" />
+    -->
+  </node>
+
+  <!--Relay atlas joint states to motion editor. -->
+  <node args="/atlas/joint_states /flor/motion/robot/joint_states" name="joint_states_to_motion_editor" pkg="topic_tools" type="relay" />
+
+  <!-- start trajectory controller for ghost -->
+  <node name="kinematic_trajectory_controller" pkg="flor_motion" type="kinematic_trajectory_controller" respawn="true">
+    <!-- let this controller work on the ghost -->
+    <remap from="/flor/motion/robot/joint_states" to="/flor/motion/ghost/joint_states" />
+    <remap from="/flor/motion/robot/torso_controller/trajectory" to="/flor/motion/ghost/torso_controller/trajectory" />
+    <remap from="/flor/motion/robot/head_controller/trajectory" to="/flor/motion/ghost/head_controller/trajectory" />
+    <remap from="/flor/motion/robot/l_arm_controller/trajectory" to="/flor/motion/ghost/l_arm_controller/trajectory" />
+    <remap from="/flor/motion/robot/l_leg_controller/trajectory" to="/flor/motion/ghost/l_leg_controller/trajectory" />
+    <remap from="/flor/motion/robot/r_arm_controller/trajectory" to="/flor/motion/ghost/r_arm_controller/trajectory" />
+    <remap from="/flor/motion/robot/r_leg_controller/trajectory" to="/flor/motion/ghost/r_leg_controller/trajectory" />
+    
+    <remap from="/flor/motion/robot/torso_controller/joint_states" to="/flor/motion/ghost/torso_controller/joint_states" />
+    <remap from="/flor/motion/robot/head_controller/joint_states" to="/flor/motion/ghost/head_controller/joint_states" />
+    <remap from="/flor/motion/robot/l_arm_controller/joint_states" to="/flor/motion/ghost/l_arm_controller/joint_states" />
+    <remap from="/flor/motion/robot/l_leg_controller/joint_states" to="/flor/motion/ghost/l_leg_controller/joint_states" />
+    <remap from="/flor/motion/robot/r_arm_controller/joint_states" to="/flor/motion/ghost/r_arm_controller/joint_states" />
+    <remap from="/flor/motion/robot/r_leg_controller/joint_states" to="/flor/motion/ghost/r_leg_controller/joint_states" />
+  </node>
+
+  <node name="ghost_joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" respawn="true">
+    <remap from="joint_states" to="/flor/motion/ghost/joint_states" />
+    <rosparam param="source_list">
+        - /flor/motion/ghost/torso_controller/joint_states
+        - /flor/motion/ghost/head_controller/joint_states
+        - /flor/motion/ghost/l_arm_controller/joint_states
+        - /flor/motion/ghost/l_leg_controller/joint_states
+        - /flor/motion/ghost/r_arm_controller/joint_states
+        - /flor/motion/ghost/r_leg_controller/joint_states
+        - /joint_states_to_ghost
+    </rosparam>
+  </node>
+
+  <!--Connect ghost and real robot via tf (same pelvis transform for the moment-->
+  <node pkg="tf" type="static_transform_publisher" name="simulation_frame_broadcaster" args="0 0 0 0 0 0 /pelvis /ghost/pelvis 100" />
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" respawn="true">
+    <remap from="joint_states" to="/flor/motion/ghost/joint_states" />
+    <param name="tf_prefix" value="/ghost"/>
+  </node>
+
+  <!--Control mode GUI for real robot-->
+  <node name="vigir_rqt_control_mode"        pkg="vigir_rqt_control_mode"        type="control_mode"         /> <!--  output="screen" launch-prefix="xterm -e" / -->
+
+  <!--Joint control GUI for real robot-->
+  <node name="vigir_rqt_joint_control"      pkg="vigir_rqt_joint_control"      type="joint_control"         /> <!--  output="screen" launch-prefix="xterm -e" / -->
+
+  <!--Ghost control GUI-->
+  <node name="vigir_rqt_ghost_robot_control"      pkg="vigir_rqt_ghost_robot_control"      type="ghost_control"         />
+
+  <!-- This launches the components affiliated with state estimation -->
+  <include file="$(find vigir_state_estimation)/launch/state_estimation.launch"/>
+
+  <!-- This launches the visualization node for displaying the MarkerArray with stability data -->
+  <include file="$(find flor_visualization)/launch/flor_visualization_default.launch"/>
+
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find vigir_rqt_motion_editor)/rviz/rviz_with_ghost.rviz" respawn="true" />
+
+
+  <!-- This launches the main controller node -->
+  <!--Can't remap rqt stuff as stated above, so remap controller topics. Hack, hack-->
+  <node name="flor_robot_controller" pkg="flor_robot_controller" type="flor_sim_controller_node" > <!-- respawn="true" -->
+     <param name="publish_statistics_count" value="2000" />
+     <remap from="/pose" to="/flor/state/pelvis_pose_world" />
+     <remap from="/flor/neck_controller/joint_state" to="/atlas/pos_cmd/neck_ry" />
+
+     <remap from="/flor/torso_controller/trajectory" to="/flor/motion/robot/torso_controller/trajectory"/>
+     <remap from="/flor/head_controller/trajectory"  to="/flor/motion/robot/head_controller/trajectory" />
+     <remap from="/flor/l_arm_controller/trajectory" to="/flor/motion/robot/l_arm_controller/trajectory" />
+     <remap from="/flor/l_leg_controller/trajectory" to="/flor/motion/robot/l_leg_controller/trajectory" />
+     <remap from="/flor/r_arm_controller/trajectory" to="/flor/motion/robot/r_arm_controller/trajectory" />
+     <remap from="/flor/r_leg_controller/trajectory" to="/flor/motion/robot/r_leg_controller/trajectory" />
+   </node>
+</launch>

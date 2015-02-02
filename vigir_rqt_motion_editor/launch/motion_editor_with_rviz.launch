@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<launch>
+<!--
+  <arg name="robot_model" default="$(find flor_atlas_description)/robots/flor_atlas_v3.urdf"/>
+  <param name="robot_description" textfile="$(arg robot_model)" />
+  -->
+   <param name="robot_description" command="$(find xacro)/xacro.py '$(find flor_atlas_description)/robots/flor_atlas.urdf.xacro'" />
+
+  <param name="use_gui" value="True"/>
+
+  <node name="motion_editor" pkg="vigir_rqt_motion_editor" type="motion_editor" respawn="true" >
+    <!-- 
+    args="-c"
+    currently remapping does not work with rqt: https://github.com/ros-visualization/rqt/pull/76
+    <remap from="/flor/torso_controller/trajectory" to="/flor/torso_controller/kinematic_trajectory" />
+    <remap from="/flor/head_controller/trajectory" to="/flor/head_controller/kinematic_trajectory" />
+    <remap from="/flor/l_arm_controller/trajectory" to="/flor/l_arm_controller/kinematic_trajectory" />
+    <remap from="/flor/l_leg_controller/trajectory" to="/flor/l_leg_controller/kinematic_trajectory" />
+    <remap from="/flor/r_arm_controller/trajectory" to="/flor/r_arm_controller/kinematic_trajectory" />
+    <remap from="/flor/r_leg_controller/trajectory" to="/flor/r_leg_controller/kinematic_trajectory" />
+    -->
+  </node>
+
+  <node args="/atlas/joint_states /flor/motion/robot/joint_states" name="joint_states_to_motion_editor" pkg="topic_tools" type="relay" />
+
+  <node name="kinematic_trajectory_controller" pkg="flor_motion" type="kinematic_trajectory_controller" respawn="true"/>
+
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" respawn="true">
+    <remap from="joint_states" to="/atlas/joint_states" />
+    <rosparam param="source_list">
+        - /flor/motion/robot/torso_controller/joint_states
+        - /flor/motion/robot/neck_controller/joint_states
+        - /flor/motion/robot/l_arm_controller/joint_states
+        - /flor/motion/robot/l_leg_controller/joint_states
+        - /flor/motion/robot/r_arm_controller/joint_states
+        - /flor/motion/robot/r_leg_controller/joint_states
+    </rosparam>
+  </node>
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" respawn="true">
+    <remap from="joint_states" to="/atlas/joint_states" />
+  </node>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find flor_robot_tools)/rviz/xacrodisplay_default.rviz" respawn="true" />
+</launch>

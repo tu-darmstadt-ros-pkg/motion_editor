@@ -1,0 +1,10 @@
+#!/usr/bin/env python
+
+import roslib
+
+pkg = 'flor_motion'
+roslib.load_manifest(pkg)
+
+from flor_motion.motion_service import main
+
+main()
