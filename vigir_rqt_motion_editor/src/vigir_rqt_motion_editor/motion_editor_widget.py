@@ -99,7 +99,7 @@ class MotionEditorWidget(QWidget):
         self._clear_playback_marker()
         for appendix_name in appendix_names:
             target_position = [0] * len(appendix_by_name[appendix_name]['joint_names'])
-            self._motion_publisher.move_to_position(appendix_name, target_position)
+            self._motion_publisher.move_to_position(appendix_name, target_position, self.time_factor_spin.value())
 
     @Slot()
     def on_run_motion_button_clicked(self):
@@ -111,7 +111,7 @@ class MotionEditorWidget(QWidget):
             QMessageBox.warning(self, 'Error', 'Motion "%s" not in motion list.' % motion_name)
             return
         self._clear_playback_marker()
-        self._motion_publisher.publish_motion(self._motion_data[motion_name])
+        self._motion_publisher.publish_motion(self._motion_data[motion_name], self.time_factor_spin.value())
 
     @Slot(str)
     def on_filter_pattern_edit_textChanged(self, pattern):
@@ -187,7 +187,7 @@ class MotionEditorWidget(QWidget):
         result = menu.exec_(list_widget.mapToGlobal(pos))
         if result in move_to:
             appendix_name = move_to[result]
-            self._motion_publisher.move_to_position(appendix_name, adapt_to_side(appendix_name, list_item._data))
+            self._motion_publisher.move_to_position(appendix_name, adapt_to_side(appendix_name, list_item._data), self.time_factor_spin.value())
 
     def get_motion_from_timeline(self):
         motion = {}
