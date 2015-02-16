@@ -7,7 +7,6 @@ appendixes = (
     {'name': 'head', 'joint_names': ('head_pan', 'head_tilt')},
     {'name': 'torso', 'joint_names': ('waist_pan', 'waist_tilt')},
 )
-appendix_types = ('arm', 'leg', 'torso', 'head')
 
 appendix_by_name = dict(((appendix['name'], appendix) for appendix in appendixes))
 appendix_names = list([appendix['name'] for appendix in appendixes])
@@ -21,6 +20,8 @@ for appendix in appendixes:
 
 def remove_side_prefix(appendix_name):
     return appendix_name.split('_')[-1]
+
+appendix_types = set(remove_side_prefix(appendix['name']) for appendix in appendixes)
 
 
 def adapt_to_side(appendix_name, positions):
