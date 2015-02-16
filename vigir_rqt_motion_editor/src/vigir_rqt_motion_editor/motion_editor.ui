@@ -74,7 +74,7 @@
             <item>
              <widget class="QLabel" name="label_5">
               <property name="text">
-               <string>Neck</string>
+               <string>Head</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -236,7 +236,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QListWidget" name="neck_positions_list">
+             <widget class="QListWidget" name="head_positions_list">
               <property name="palette">
                <palette>
                 <active>

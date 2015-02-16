@@ -170,7 +170,7 @@ class MotionEditorWidget(QWidget):
     def torso_positions_list_context_menu(self, pos):
         self.positions_list_context_menu('torso', pos)
         
-    def neck_positions_list_context_menu(self, pos):
+    def head_positions_list_context_menu(self, pos):
         self.positions_list_context_menu('neck', pos)
 
     def positions_list_context_menu(self, appendix_type, pos):
