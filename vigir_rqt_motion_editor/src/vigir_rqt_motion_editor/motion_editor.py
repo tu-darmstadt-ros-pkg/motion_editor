@@ -19,9 +19,7 @@ class MotionEditorPlugin(Plugin):
         super(MotionEditorPlugin, self).__init__(context)
         self.setObjectName('MotionEditorPlugin')
 
-        motion_publishers = {'ghost': MotionPublisher(), 'robot': MotionPublisher()}
-        motion_publishers['ghost'].set_subscriber_prefix('/thor_mang')
-        motion_publishers['ghost'].set_publisher_prefix('/thor_mang')
+        motion_publishers = {'robot': MotionPublisher()}
         motion_publishers['robot'].set_subscriber_prefix('/thor_mang')
         motion_publishers['robot'].set_publisher_prefix('/thor_mang')
 

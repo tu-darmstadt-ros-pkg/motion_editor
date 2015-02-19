@@ -97,6 +97,7 @@ class TrajectoryPublisher(object):
         self._publisher_prefix = prefix
         if prefix not in self._publishers:
             self._publishers[prefix] = rospy.Publisher('%s/%s/command' % (prefix, self._appendix['controller_topic']), JointTrajectory)
+            print 'Creating traj publisher for topic ', '%s/%s/command' % (prefix, self._appendix['controller_topic'])
 
 
     def _add_point(self, time, positions):
@@ -132,6 +133,7 @@ class TrajectoryPublisher(object):
             last_motion = motion
 
         self._publishers[self._publisher_prefix].publish(self._trajectory)
+        print 'Publishing with prefix ', self._publisher_prefix
 
 
     def shutdown(self):
