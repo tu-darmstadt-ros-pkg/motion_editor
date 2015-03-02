@@ -38,7 +38,6 @@ class InputOutputSelectorWidget(QWidget):
 
     def get_current_positions(self, *args, **kwargs):
         v = self._selected_publisher['input'].get_current_positions(*args, **kwargs)
-        print args, kwargs, v
         return v
 
     def move_to_position(self, *args, **kwargs):

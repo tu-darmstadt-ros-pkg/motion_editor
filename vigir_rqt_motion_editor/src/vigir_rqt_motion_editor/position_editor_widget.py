@@ -50,7 +50,7 @@ class PositionEditorWidget(QWidget):
         appendix = appendix_by_name[appendix_name]
         current_positions = self._motion_publisher.get_current_positions(appendix)
         current_positions = adapt_to_side(appendix_name, current_positions)
-        print 'saving %s as "%s": %s' % (appendix_name, position_name, current_positions)
+        print 'Saving %s as "%s": %s' % (appendix_name, position_name, current_positions)
         self._position_data[remove_side_prefix(appendix_name)].save(position_name, current_positions)
         self.position_list_updated.emit(self._position_data)
         self.on_save_appendix_combo_currentIndexChanged(appendix_name)
