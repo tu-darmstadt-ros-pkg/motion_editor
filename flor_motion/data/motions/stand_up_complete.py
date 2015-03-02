@@ -122,7 +122,7 @@
                                                         0.3657,
                                                         -0.0202],
                                          'starttime': 14.081}],
-                         'neck': [ { 'duration': 1.0,
+                         'head': [ { 'duration': 1.0,
                                      'name': u'stand_up_0',
                                      'positions': [0.0001, -0.9375],
                                      'starttime': 0.0}],

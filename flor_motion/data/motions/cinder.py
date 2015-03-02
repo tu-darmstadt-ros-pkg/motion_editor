@@ -46,7 +46,7 @@
                                              1.5805,
                                              -0.26],
                               'starttime': 13.021}],
-              'neck': [ { 'duration': 1.0,
+              'head': [ { 'duration': 1.0,
                           'name': u'cinder_0',
                           'positions': [-0.0, -1.5029],
                           'starttime': 0.0}],
