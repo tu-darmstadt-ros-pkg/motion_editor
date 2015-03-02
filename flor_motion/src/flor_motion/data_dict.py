@@ -17,7 +17,7 @@ class DataDict(dict):
     def _load(self, clean_up=False):
         for data_file_name in glob.glob(os.path.join(self._data_path, '*.py')):
             data_name_from_file_name = os.path.basename(data_file_name)[:-3]
-            print 'Info: loading file "%s"' % (os.path.basename(data_file_name))
+            # print 'Info: loading file "%s"' % (os.path.basename(data_file_name))
             try:
                 data_dicts = eval(open(data_file_name, 'U').read())
             except Exception as e:

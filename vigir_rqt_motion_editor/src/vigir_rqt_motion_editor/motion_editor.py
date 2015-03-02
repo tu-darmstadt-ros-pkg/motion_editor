@@ -42,6 +42,3 @@ class MotionEditorPlugin(Plugin):
 
     def restore_settings(self, plugin_settings, instance_settings):
         self._motion_editor.restore_settings(plugin_settings, instance_settings)
-
-    #def shutdown_plugin(self):
-        #self._widget.shutdown()

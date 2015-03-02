@@ -88,7 +88,7 @@ class PositionEditorWidget(QWidget):
         appendix_name = str(self.move_appendix_combo.currentText())
         target_positions = self._position_data[remove_side_prefix(appendix_name)][position_name]
         target_positions = adapt_to_side(appendix_name, target_positions)
-        print 'moving %s to "%s": %s' % (appendix_name, position_name, target_positions)
+        print 'Moving %s to "%s": %s' % (appendix_name, position_name, target_positions)
         self._motion_publisher.move_to_position(appendix_name, target_positions)
 
     def shutdown(self):

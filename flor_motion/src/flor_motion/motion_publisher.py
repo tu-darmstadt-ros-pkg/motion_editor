@@ -26,17 +26,19 @@ class MotionPublisher(object):
 
 
     def set_subscriber_prefix(self, prefix):
-        print 'sub:', prefix
+        print 'Setting subscriber prefix to:', prefix
         if self._subscriber_prefix == prefix:
             return
         self._subscriber_prefix = prefix
         if prefix not in self._state_subscribers:
             self._joint_states[prefix] = JointState()
-            self._state_subscribers[prefix] = rospy.Subscriber('%s/joint_states' % (prefix), JointState, self._state_callback, prefix)
+            joint_state_topic = '%s/joint_states' % prefix
+            print 'Subscribing to topic:', joint_state_topic
+            self._state_subscribers[prefix] = rospy.Subscriber(joint_state_topic, JointState, self._state_callback, prefix)
 
 
     def set_publisher_prefix(self, prefix):
-        print 'pub:', prefix
+        print 'Setting publisher prefix to:', prefix
         self._publisher_prefix = prefix
         for publisher in self._trajectory_publisher.values():
             publisher.set_publisher_prefix(self._publisher_prefix)
@@ -65,7 +67,7 @@ class MotionPublisher(object):
         try:
             joint_ids = [self._joint_states[self._subscriber_prefix].name.index(joint_name) for joint_name in appendix['joint_names']]
         except ValueError as e:
-            print 'Error: Some joint was not found in joint state:\n%s' % (e,)
+            print 'Error: Some joint was not found in received joint state:\n%s' % (e,)
             return None
         current_positions = [round(self._joint_states[self._subscriber_prefix].position[joint_id], self._precision) for joint_id in joint_ids]
         return current_positions
@@ -96,8 +98,8 @@ class TrajectoryPublisher(object):
             return
         self._publisher_prefix = prefix
         if prefix not in self._publishers:
-            self._publishers[prefix] = rospy.Publisher('%s/%s/command' % (prefix, self._appendix['controller_topic']), JointTrajectory)
-            print 'Creating traj publisher for topic ', '%s/%s/command' % (prefix, self._appendix['controller_topic'])
+            self._publishers[prefix] = rospy.Publisher('%s/%s/command' % (prefix, self._appendix['controller_topic']), JointTrajectory, queue_size=1000)
+            print 'Publishing to topic:', '%s/%s/command' % (prefix, self._appendix['controller_topic'])
 
 
     def _add_point(self, time, positions):
@@ -133,8 +135,6 @@ class TrajectoryPublisher(object):
             last_motion = motion
 
         self._publishers[self._publisher_prefix].publish(self._trajectory)
-        print 'Publishing with prefix ', self._publisher_prefix
-
 
     def shutdown(self):
         for pub in self._publishers.values():
