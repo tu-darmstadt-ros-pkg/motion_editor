@@ -15,7 +15,7 @@ joint_id_to_name = dict(enumerate(joint_names))
 joint_name_to_id = dict([(v, k) for k, v in enumerate(joint_names)])
 for appendix in appendixes:
     appendix['joint_ids'] = tuple(joint_name_to_id[name] for name in appendix['joint_names'])
-    appendix['controller_topic'] = '%s_traj_controller' % appendix['name']
+    appendix['controller_topic'] = '%s_traj_controller/command' % appendix['name']
 
 
 def remove_side_prefix(appendix_name):
