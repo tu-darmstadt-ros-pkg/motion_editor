@@ -1,5 +1,5 @@
 import roslib
-roslib.load_manifest('vigir_rqt_motion_editor')
+roslib.load_manifest('rqt_motion_editor')
 import rospy
 import os
 import re
@@ -7,8 +7,8 @@ from python_qt_binding import loadUi
 from python_qt_binding.QtCore import Slot, QTimer
 from python_qt_binding.QtGui import QApplication, QWidget, QListWidgetItem, QMessageBox, QMenu
 
-from flor_motion.joint_configuration import adapt_to_side, appendix_names, appendix_by_name, remove_side_prefix, appendix_types
-from flor_motion.motion_data import MotionData
+from motion_editor_core.joint_configuration import adapt_to_side, appendix_names, appendix_by_name, remove_side_prefix, appendix_types
+from motion_editor_core.motion_data import MotionData
 from timeline_widget import TimelineWidget
 
 
@@ -243,7 +243,7 @@ class MotionEditorWidget(QWidget):
 
 if __name__ == '__main__':
     import sys
-    from flor_motion.motion_publisher import MotionPublisher
+    from motion_editor_core.motion_publisher import MotionPublisher
     app = QApplication(sys.argv)
     widget = MotionEditorWidget(MotionPublisher())
     positions = {

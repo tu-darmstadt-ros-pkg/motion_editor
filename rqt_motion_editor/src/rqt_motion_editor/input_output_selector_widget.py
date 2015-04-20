@@ -1,5 +1,5 @@
 import roslib
-roslib.load_manifest('vigir_rqt_motion_editor')
+roslib.load_manifest('rqt_motion_editor')
 
 import os
 from python_qt_binding import loadUi

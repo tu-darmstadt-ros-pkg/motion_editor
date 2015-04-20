@@ -23,7 +23,7 @@
 
   <node args="/atlas/joint_states /flor/motion/robot/joint_states" name="joint_states_to_motion_editor" pkg="topic_tools" type="relay" />
 
-  <node name="kinematic_trajectory_controller" pkg="flor_motion" type="kinematic_trajectory_controller" respawn="true"/>
+  <node name="kinematic_trajectory_controller" pkg="motion_editor_core" type="kinematic_trajectory_controller" respawn="true"/>
 
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" respawn="true">
     <remap from="joint_states" to="/atlas/joint_states" />

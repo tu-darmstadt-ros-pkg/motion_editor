@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import roslib
-roslib.load_manifest('flor_motion')
+roslib.load_manifest('motion_editor_core')
 import os
 import glob
 import pprint

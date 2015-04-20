@@ -1,11 +1,11 @@
 import roslib
-roslib.load_manifest('vigir_rqt_motion_editor')
+roslib.load_manifest('rqt_motion_editor')
 
 from rqt_gui_py.plugin import Plugin
 from python_qt_binding.QtCore import Signal
 from python_qt_binding.QtGui import QWidget, QVBoxLayout
 
-from flor_motion.motion_publisher import MotionPublisher
+from motion_editor_core.motion_publisher import MotionPublisher
 
 from .position_editor_widget import PositionEditorWidget
 from .motion_editor_widget import MotionEditorWidget

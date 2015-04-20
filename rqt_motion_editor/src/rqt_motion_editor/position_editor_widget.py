@@ -1,13 +1,13 @@
 import roslib
-roslib.load_manifest('vigir_rqt_motion_editor')
+roslib.load_manifest('rqt_motion_editor')
 
 import os
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import Signal, Slot
 from python_qt_binding.QtGui import QWidget, QMessageBox
 
-from flor_motion.joint_configuration import appendix_by_name, appendix_names, remove_side_prefix, adapt_to_side
-from flor_motion.position_data import PositionData
+from motion_editor_core.joint_configuration import appendix_by_name, appendix_names, remove_side_prefix, adapt_to_side
+from motion_editor_core.position_data import PositionData
 
 
 class PositionEditorWidget(QWidget):

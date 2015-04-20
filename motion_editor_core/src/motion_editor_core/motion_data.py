@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import roslib
-roslib.load_manifest('flor_motion')
+roslib.load_manifest('motion_editor_core')
 import os
 from data_dict import DataDict
 
@@ -8,8 +8,8 @@ from data_dict import DataDict
 class MotionData(DataDict):
 
     def __init__(self, clean_up=False):
-        flor_motion_path = roslib.packages.get_pkg_dir('flor_motion')
-        motion_data_path = os.path.join(flor_motion_path, 'data', 'motions')
+        motion_editor_core_path = roslib.packages.get_pkg_dir('motion_editor_core')
+        motion_data_path = os.path.join(motion_editor_core_path, 'data', 'motions')
         super(MotionData, self).__init__(motion_data_path, 'motion', clean_up=clean_up)
 
 

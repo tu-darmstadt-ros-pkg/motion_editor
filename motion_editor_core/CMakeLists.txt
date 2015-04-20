@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(flor_motion)
+project(motion_editor_core)
 
 find_package(catkin REQUIRED COMPONENTS
   rospy

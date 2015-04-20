@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <launch>
-  
-  <!--  <arg name="robot_model" default="$(find atlas)/atlas.urdf"/>
-  <param name="robot_description" textfile="$(arg robot_model)" />-->
+  <arg name="robot_model" default="$(find atlas)/atlas.urdf"/>
+  <param name="robot_description" textfile="$(arg robot_model)" />
   <param name="use_gui" value="True"/>
 
   <node name="motion_editor" pkg="vigir_rqt_motion_editor" type="motion_editor" respawn="true" args="-c">
@@ -21,7 +20,7 @@
   <node args="/atlas/joint_states /flor/motion/robot/joint_states" name="joint_states_to_motion_editor" pkg="topic_tools" type="relay" />
 
   <!-- start trajectory controller for ghost -->
-  <node name="kinematic_trajectory_controller" pkg="flor_motion" type="kinematic_trajectory_controller" respawn="true">
+  <node name="kinematic_trajectory_controller" pkg="motion_editor_core" type="kinematic_trajectory_controller" respawn="true">
     <!-- let this controller work on the ghost -->
     <remap from="/flor/motion/robot/joint_states" to="/flor/motion/ghost/joint_states" />
     <remap from="/flor/motion/robot/torso_controller/trajectory" to="/flor/motion/ghost/torso_controller/trajectory" />
@@ -85,7 +84,7 @@
      <param name="publish_statistics_count" value="2000" />
      <remap from="/pose" to="/flor/state/pelvis_pose_world" />
      <remap from="/flor/neck_controller/joint_state" to="/atlas/pos_cmd/neck_ry" />
-     
+
      <remap from="/flor/torso_controller/trajectory" to="/flor/motion/robot/torso_controller/trajectory"/>
      <remap from="/flor/head_controller/trajectory"  to="/flor/motion/robot/head_controller/trajectory" />
      <remap from="/flor/l_arm_controller/trajectory" to="/flor/motion/robot/l_arm_controller/trajectory" />
@@ -93,84 +92,4 @@
      <remap from="/flor/r_arm_controller/trajectory" to="/flor/motion/robot/r_arm_controller/trajectory" />
      <remap from="/flor/r_leg_controller/trajectory" to="/flor/motion/robot/r_leg_controller/trajectory" />
    </node>
-   
-   <!--******************************************** Additions Onboard ********************************************-->
-   
-   <!-- This launches the components affiliated with lidar processing and lidar-based mapping -->
-   <include file="$(find vigir_lidar_processing)/launch/lidar_processing.launch"/>
-   <!-- This launches the main worldmodel node -->
-   <include file="$(find vigir_worldmodel_main)/launch/worldmodel_default.launch" />
-   <!-- Start the grasping controllers -->
-   <include file="$(find vigir_grasp_testing)/launch/grasp_testing.launch" />
-   
-   <!--******************************************** Additions OCS ********************************************-->
-   <node name="vigir_ocs_main_3d_view"         pkg="vigir_ocs_main_3d_view"         type="main_3d_view"          /> <!--  output="screen" launch-prefix="xterm -e" / -->
-   <node name="vigir_ocs_map_view"             pkg="vigir_ocs_map_view"             type="map_view"              /> <!--  output="screen" launch-prefix="xterm -e" / -->
-   <node name="vigir_ocs_camera_viewer_custom" pkg="vigir_ocs_camera_viewer_custom" type="camera_viewer_custom"  /> <!--  output="screen" launch-prefix="xterm -e" / -->
-   <node name="vigir_ocs_template_manager"     pkg="vigir_ocs_template_manager"     type="template_manager"      /> <!--  output="screen" launch-prefix="xterm -e" / -->
-   
-       <node name="right_grasp_ui" pkg="vigir_ocs_grasp_widget" type="grasp_widget" > <!--  output="screen" launch-prefix="xterm -e"  -->
-        <param name="/graspWidget/hand" value="right" />
-
-        <!-- Publications -->
-        <remap from="/template/grasp_mode_command" to="/grasp_control/r_hand/mode_command" />
-        <remap from="/template/grasp_selection"    to="/grasp_control/r_hand/grasp_selection" />
-        <remap from="/template/release_grasp"      to="/grasp_control/r_hand/release_grasp" />
-
-        <!-- Subscriptions -->
-        <remap from="/template/active_state"            to="/grasp_control/r_hand/active_state" />
-        <remap from="/template/template_match_feedback" to="/grasp_control/template_selection" />
-
-    </node>
-
-    <node name="left_grasp_ui" pkg="vigir_ocs_grasp_widget" type="grasp_widget" > <!--  output="screen" launch-prefix="xterm -e"  -->
-        <param name="/graspWidget/hand" value="left" />
-
-        <!-- Publications -->
-        <remap from="/template/grasp_mode_command" to="/grasp_control/l_hand/mode_command" />
-        <remap from="/template/grasp_selection"    to="/grasp_control/l_hand/grasp_selection" />
-        <remap from="/template/release_grasp"      to="/grasp_control/l_hand/release_grasp" />
-
-        <!-- Subscriptions -->
-        <remap from="/template/active_state"            to="/grasp_control/l_hand/active_state" />
-        <remap from="/template/template_match_feedback" to="/grasp_control/template_selection" />
-
-    </node>
-    <node pkg="message_to_tf" type="message_to_tf" name="ghost_left_hand_state_to_tf" output="screen">
-      <param name="pose_topic" value="/ghost_left_hand_pose" /> <!-- frame_id in the pose has to be /world -->
-      <param name="footprint_frame_id" value="/ghost_left_hand_footprint" />
-      <param name="stabilized_frame_id" value="/ghost_left_hand_stabilized" />
-      <param name="child_frame_id" value="/left_hand_model/left_palm" />    
-    </node>
-    
-    <node pkg="message_to_tf" type="message_to_tf" name="ghost_right_hand_state_to_tf" output="screen">
-      <param name="pose_topic" value="/ghost_right_hand_pose" /> <!-- frame_id in the pose has to be /world -->
-      <param name="footprint_frame_id" value="/ghost_right_hand_footprint" />
-      <param name="stabilized_frame_id" value="/ghost_right_hand_stabilized" />
-      <param name="child_frame_id" value="/right_hand_model/right_palm" />    
-    </node>
-    
-    <node name="ghost_left_hand_state_publisher" pkg="robot_state_publisher" type="state_publisher" respawn="true">
-      <remap from="robot_description" to="left_hand_robot_description" />
-      <remap from="joint_states" to="/ghost_left_hand/joint_states" />
-      <param name="tf_prefix" value="/left_hand_model"/>
-    </node>
-    
-    <node name="ghost_right_hand_state_publisher" pkg="robot_state_publisher" type="state_publisher" respawn="true">
-      <remap from="robot_description" to="right_hand_robot_description" />
-      <remap from="joint_states" to="/ghost_right_hand/joint_states" />
-      <param name="tf_prefix" value="/right_hand_model"/>
-    </node>
-
-    <!-- Robot descriptions for the ghost data -->
-    <arg name="left_hand_robot_model" default="$(find flor_sandia_hands_tools)/urdf/sandia_hand_left.urdf"/>
-    <param name="left_hand_robot_description" textfile="$(arg left_hand_robot_model)" />
-    
-    <arg name="right_hand_robot_model" default="$(find flor_sandia_hands_tools)/urdf/sandia_hand_right.urdf"/>
-    <param name="right_hand_robot_description" textfile="$(arg right_hand_robot_model)" />
-
-    <node name="vigir_ocs_template_nodelet" pkg="vigir_ocs_template_nodelet" type="template_nodelet" > <!--  output="screen" launch-prefix="xterm -e" / -->
-      <remap from="/template/template_match_feedback" to="/grasp_control/template_selection" />
-    </node>
-<node name="vigir_ocs_interactive_marker_server_nodelet"     pkg="vigir_ocs_interactive_marker_server_nodelet"     type="interactive_marker_server_nodelet"  respawn="true"    /> <!--  output="screen" launch-prefix="xterm -e" / -->
 </launch>

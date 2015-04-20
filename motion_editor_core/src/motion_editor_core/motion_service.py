@@ -1,10 +1,10 @@
 import roslib
-roslib.load_manifest('flor_motion')
+roslib.load_manifest('motion_editor_core')
 import rospy
-from flor_motion.srv import ExecuteMotion, ExecuteMotionResponse
+from motion_editor_core.srv import ExecuteMotion, ExecuteMotionResponse
 from .motion_publisher import MotionPublisher
 from .motion_data import MotionData
-from flor_motion.msg import ExecuteMotionCommand
+from motion_editor_core.msg import ExecuteMotionCommand
 
 class MotionService(object):
 
@@ -48,7 +48,7 @@ class MotionService(object):
         return response
 
     def start_server(self):
-        rospy.init_node('flor_motion_service')
+        rospy.init_node('motion_editor_core_service')
         rospy.Service('thor_mang/motion_service/execute_motion', ExecuteMotion, self._execute_motion)
         print 'MotionService: Waiting for calls...'
         rospy.spin()
