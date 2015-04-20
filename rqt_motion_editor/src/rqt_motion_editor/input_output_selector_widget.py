@@ -23,8 +23,8 @@ class InputOutputSelectorWidget(QWidget):
             self._input_buttons[name] = self._add_radio_button(self.input_group, 'input', name)
             self._output_buttons[name] = self._add_radio_button(self.output_group, 'output', name)
 
-        self._input_buttons['robot'].setChecked(True)
-        self._output_buttons['robot'].setChecked(True)
+        self._input_buttons.values()[0].setChecked(True)
+        self._output_buttons.values()[0].setChecked(True)
 
     def _add_radio_button(self, group, group_name, name):
         radio_button = QRadioButton(name)

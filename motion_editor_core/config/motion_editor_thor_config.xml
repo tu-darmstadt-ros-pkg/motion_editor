@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <config>
-	<robot name="thor" ns="/thor_mang">
+	<robot>
 	  <group name="r_arm" type="arm">
 	    <joint name="r_elbow"/>
 	    <joint name="r_shoulder_pitch"/>
@@ -21,4 +21,7 @@
 	    <joint name="l_wrist_yaw2"/>
 	  </group>
 	</robot>
+
+	<target name="Thor" sub="/thor_mang" pub="/thor_mang"/>
+	<!--<target name="Ghost" sub="/thor_mang" pub="/thor_mang"/> -->
 </config>

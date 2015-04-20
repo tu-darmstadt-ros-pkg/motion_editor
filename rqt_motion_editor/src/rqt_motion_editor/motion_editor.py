@@ -11,6 +11,8 @@ from .position_editor_widget import PositionEditorWidget
 from .motion_editor_widget import MotionEditorWidget
 from .input_output_selector_widget import InputOutputSelectorWidget
 
+from motion_editor_core.robot_config import RobotConfigLoader
+
 
 class MotionEditorPlugin(Plugin):
     updateStateSignal = Signal(object)
@@ -19,9 +21,14 @@ class MotionEditorPlugin(Plugin):
         super(MotionEditorPlugin, self).__init__(context)
         self.setObjectName('MotionEditorPlugin')
 
-        motion_publishers = {'robot': MotionPublisher()}
-        motion_publishers['robot'].set_subscriber_prefix('/thor_mang')
-        motion_publishers['robot'].set_publisher_prefix('/thor_mang')
+        config_loader = RobotConfigLoader()
+        config_loader.load_xml_by_name('motion_editor_thor_config.xml')
+
+        motion_publishers = {}
+        for target in config_loader.targets:
+            motion_publishers[target.name] = MotionPublisher()
+            motion_publishers[target.name].set_subscriber_prefix(target.sub)
+            motion_publishers[target.name].set_publisher_prefix(target.pub)
 
         input_output_selector = InputOutputSelectorWidget(motion_publishers)
         self._motion_editor = MotionEditorWidget(input_output_selector)
