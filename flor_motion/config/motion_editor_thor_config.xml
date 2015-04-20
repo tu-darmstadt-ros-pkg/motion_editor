@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<config>
+	<robot name="thor" ns="/thor_mang">
+	  <group name="r_arm" type="arm">
+	    <joint name="r_elbow"/>
+	    <joint name="r_shoulder_pitch"/>
+	    <joint name="r_shoulder_roll"/>
+	    <joint name="r_shoulder_yaw"/>
+	    <joint name="r_wrist_roll"/>
+	    <joint name="r_wrist_yaw1"/>
+	    <joint name="r_wrist_yaw2"/>    
+	  </group>
+
+	  <group name="l_arm" type="arm" mirrored="true">
+	    <joint name="l_elbow"/>
+	    <joint name="l_shoulder_pitch"/>
+	    <joint name="l_shoulder_roll"/>
+	    <joint name="l_shoulder_yaw"/>
+	    <joint name="l_wrist_roll"/>
+	    <joint name="l_wrist_yaw1"/>
+	    <joint name="l_wrist_yaw2"/>
+	  </group>
+	</robot>
+</config>
