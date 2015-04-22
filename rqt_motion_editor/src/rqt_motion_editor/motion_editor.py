@@ -1,5 +1,6 @@
 import roslib
 roslib.load_manifest('rqt_motion_editor')
+import rospy
 
 from rqt_gui_py.plugin import Plugin
 from python_qt_binding.QtCore import Signal
@@ -22,17 +23,21 @@ class MotionEditorPlugin(Plugin):
         self.setObjectName('MotionEditorPlugin')
 
         config_loader = RobotConfigLoader()
-        config_loader.load_xml_by_name('motion_editor_thor_config.xml')
+        try:
+            robot_config_name = rospy.get_param('/motion_editor/robot_config')
+        except KeyError:
+            rospy.logwarn('Could not find robot config param in /motion_editor/robot_config. Using default config for '
+                          'Thor Mang.')
+            robot_config_name = 'thor'
+        config_loader.load_xml_by_name(robot_config_name + '_config.xml')
 
         motion_publishers = {}
         for target in config_loader.targets:
-            motion_publishers[target.name] = MotionPublisher()
-            motion_publishers[target.name].set_subscriber_prefix(target.sub)
-            motion_publishers[target.name].set_publisher_prefix(target.pub)
+            motion_publishers[target.name] = MotionPublisher(config_loader.robot_config, target.joint_state_topic, target.publisher_prefix)
 
         input_output_selector = InputOutputSelectorWidget(motion_publishers)
-        self._motion_editor = MotionEditorWidget(input_output_selector)
-        position_editor = PositionEditorWidget(input_output_selector)
+        self._motion_editor = MotionEditorWidget(input_output_selector, config_loader.robot_config)
+        position_editor = PositionEditorWidget(input_output_selector, config_loader.robot_config)
         position_editor.position_list_updated.connect(self._motion_editor.update_positions_lists)
         position_editor.position_list_updated.emit(position_editor._position_data)
 

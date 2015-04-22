@@ -490,6 +490,7 @@ class TimelineWidget(QWidget):
     def add_track(self, track_name, track_type):
         track = self._timeline_view.scene().add_track(track_name, track_type)
         self._add_track_label(track_name, track._colors['track'])
+        return track
 
 
     def _add_track_label(self, track_name, background_color=None):

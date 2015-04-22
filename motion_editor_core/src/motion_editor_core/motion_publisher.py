@@ -6,40 +6,18 @@ import rospy
 from sensor_msgs.msg import JointState
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
-from .joint_configuration import appendixes
-
 
 class MotionPublisher(object):
     _precision = 4
 
-    def __init__(self):
-        self._joint_state = None
-        self._state_subscriber = None
-        self._subscriber_prefix = None
-        self._subscriber_prefix = None
-        self._publisher_prefix = None
+    def __init__(self, robot_config, joint_state_topic, publisher_prefix):
+        self._joint_state = JointState()
+        self._state_subscriber = rospy.Subscriber(joint_state_topic, JointState, self._state_callback)
+        self.robot_config = robot_config
 
         self._trajectory_publishers = {}
-        for appendix in appendixes:
-            self._trajectory_publishers[appendix['name']] = TrajectoryPublisher(appendix)
-
-    def set_subscriber_prefix(self, prefix):
-        if self._subscriber_prefix is not None:
-            return
-        print 'Setting subscriber prefix to:', prefix
-        self._subscriber_prefix = prefix
-        self._joint_state = JointState()
-        joint_state_topic = '%s/joint_states' % prefix
-        print 'Subscribing to topic:', joint_state_topic
-        self._state_subscriber = rospy.Subscriber(joint_state_topic, JointState, self._state_callback)
-
-    def set_publisher_prefix(self, prefix):
-        if self._publisher_prefix is not None:
-            return
-        print 'Setting publisher prefix to:', prefix
-        self._publisher_prefix = prefix
-        for publisher in self._trajectory_publishers.values():
-            publisher.set_publisher_prefix(self._publisher_prefix)
+        for group in self.robot_config.group_list():
+            self._trajectory_publishers[group.name] = TrajectoryPublisher(group, publisher_prefix)
 
     def move_to_position(self, appendix_name, target_position, duration=1.0):
         target_pos = {
@@ -52,15 +30,15 @@ class MotionPublisher(object):
         self.publish_motion(motion)
 
     def publish_motion(self, motion, time_factor=1.0):
-        for appendix in appendixes:
-            motion_list = motion.get(appendix['name'], [])
-            current_positions = self.get_current_positions(appendix)
+        for group in self.robot_config.group_list():
+            motion_list = motion.get(group.name, [])
+            current_positions = self.get_current_positions(group)
             if len(motion_list) > 0 and current_positions is not None:
-                self._trajectory_publishers[appendix['name']].publish_trajectory(current_positions, motion_list, time_factor=time_factor)
+                self._trajectory_publishers[group.name].publish_trajectory(current_positions, motion_list, time_factor=time_factor)
 
-    def get_current_positions(self, appendix):
+    def get_current_positions(self, group):
         try:
-            joint_ids = [self._joint_state.name.index(joint_name) for joint_name in appendix['joint_names']]
+            joint_ids = [self._joint_state.name.index(joint_name) for joint_name in group.joints]
         except ValueError as e:
             print 'Error: Some joint was not found in received joint state:\n%s' % e
             return None
@@ -71,25 +49,19 @@ class MotionPublisher(object):
         self._joint_state = joint_states
 
     def shutdown(self):
-        for appendix in appendixes:
-            self._trajectory_publishers[appendix['name']].shutdown()
+        for group_name in self.robot_config.groups:
+            self._trajectory_publishers[group_name].shutdown()
         self._state_subscriber.unregister()
 
 
 class TrajectoryPublisher(object):
 
-    def __init__(self, appendix):
-        self._appendix = appendix
+    def __init__(self, group, publisher_prefix):
+        self._group = group
         self._trajectory = JointTrajectory()
-        self._publisher_prefix = None
-        self._publisher = None
-
-    def set_publisher_prefix(self, prefix):
-        if self._publisher_prefix is not None:
-            return
-        self._publisher_prefix = prefix
-        self._publisher = rospy.Publisher('%s/%s' % (prefix, self._appendix['controller_topic']), JointTrajectory, queue_size=1000)
-        print 'Publishing to topic:', '%s/%s' % (prefix, self._appendix['controller_topic'])
+        self._publisher_prefix = publisher_prefix
+        self._publisher = rospy.Publisher('%s/%s' % (self._publisher_prefix, self._group.topic), JointTrajectory, queue_size=1000)
+        print 'Publishing to topic:', '%s/%s' % (self._publisher_prefix, self._group.topic)
 
     def _add_point(self, time, positions):
         point = JointTrajectoryPoint()
@@ -101,7 +73,7 @@ class TrajectoryPublisher(object):
     def publish_trajectory(self, current_positions, motion_list, time_factor = 1.0):
         self._trajectory.header.stamp = rospy.Time.now()
         self._trajectory.header.seq += 1
-        self._trajectory.joint_names = self._appendix['joint_names']
+        self._trajectory.joint_names = self._group.joints
         self._trajectory.points = []
         start_pose = {
             'name': 'current',

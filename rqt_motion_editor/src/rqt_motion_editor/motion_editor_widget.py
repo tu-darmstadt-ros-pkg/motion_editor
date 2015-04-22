@@ -4,39 +4,61 @@ import rospy
 import os
 import re
 from python_qt_binding import loadUi
-from python_qt_binding.QtCore import Slot, QTimer
-from python_qt_binding.QtGui import QApplication, QWidget, QListWidgetItem, QMessageBox, QMenu
+from python_qt_binding.QtCore import Slot, QTimer, Qt
+from python_qt_binding.QtGui import QApplication, QWidget, QListWidgetItem, QMessageBox, QMenu, QLabel, QListWidget, QAbstractItemView, QPalette, QColor
 
-from motion_editor_core.joint_configuration import adapt_to_side, appendix_names, appendix_by_name, remove_side_prefix, appendix_types
 from motion_editor_core.motion_data import MotionData
 from timeline_widget import TimelineWidget
 
 
 class MotionEditorWidget(QWidget):
 
-    def __init__(self, motion_publisher):
+    def __init__(self, motion_publisher, robot_config):
         super(MotionEditorWidget, self).__init__()
+        self.robot_config = robot_config
         self._motion_publisher = motion_publisher
-        self._motion_data = MotionData()
+        self._motion_data = MotionData(robot_config)
         self._filter_pattern = ''
         self._playback_marker = None
         self._playback_timer = None
 
         ui_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'motion_editor.ui')
         loadUi(ui_file, self)
+        self.list_widgets = {}
+        for group_type in robot_config.group_types():
+            list_widget = QListWidget()
+            list_widget.setSortingEnabled(True)
+            list_widget.setDragDropMode(QAbstractItemView.DragOnly)
+            list_widget.setContextMenuPolicy(Qt.CustomContextMenu)
 
-        for appendix_type in appendix_types:
-            list_widget = getattr(self, '%s_positions_list' % appendix_type)
-            list_widget.customContextMenuRequested.connect(getattr(self, '%s_positions_list_context_menu' % appendix_type))
+            list_widget.customContextMenuRequested.connect(
+                lambda pos, _group_type=group_type: self.positions_list_context_menu(_group_type, pos)
+            )
+
+            self.position_lists_layout.addWidget(list_widget)
+            self.list_widgets[group_type] = list_widget
 
         self._timeline_widget = TimelineWidget()
-        for track_name in appendix_names:
-            track_type = remove_side_prefix(track_name)
-            self._timeline_widget.add_track(track_name, track_type)
+        for track_name in self.robot_config.sorted_groups():
+            track_type = self.robot_config.groups[track_name].group_type
+            track = self._timeline_widget.add_track(track_name, track_type)
+
+            list_widget = self.list_widgets[track_type]
+            palette = list_widget.palette()
+            palette.setColor(QPalette.Base, track._colors['track'])
+            list_widget.setPalette(palette)
 
         self.timeline_group.layout().addWidget(self._timeline_widget)
 
+        for group_type in robot_config.group_types():
+            label = QLabel(group_type)
+            label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.group_label_layout.addWidget(label)
+
         self.update_motion_name_combo()
+
+    def set_context_entry(self, list_widget, group_type):
+        pass
 
     def save_settings(self, plugin_settings, instance_settings):
         instance_settings.set_value('splitter', self.splitter.saveState())
@@ -89,17 +111,17 @@ class MotionEditorWidget(QWidget):
             return
         self.on_clear_motion_button_clicked()
         motion = self._motion_data[motion_name]
-        for appendix_name, poses in motion.items():
+        for group_name, poses in motion.items():
             for pose in poses:
-                data = adapt_to_side(appendix_name, pose['positions'])
-                self._timeline_widget.scene().add_clip(appendix_name, pose['name'], pose['starttime'], pose['duration'], data)
+                data = self.robot_config.groups[group_name].adapt_to_side(pose['positions'])
+                self._timeline_widget.scene().add_clip(group_name, pose['name'], pose['starttime'], pose['duration'], data)
 
     @Slot()
     def on_null_motion_button_clicked(self):
         self._clear_playback_marker()
-        for appendix_name in appendix_names:
-            target_position = [0] * len(appendix_by_name[appendix_name]['joint_names'])
-            self._motion_publisher.move_to_position(appendix_name, target_position, self.time_factor_spin.value())
+        for group_name in self.robot_config.groups:
+            target_position = [0] * len(self.robot_config.groups[group_name].joints)
+            self._motion_publisher.move_to_position(group_name, target_position, self.time_factor_spin.value())
 
     @Slot()
     def on_run_motion_button_clicked(self):
@@ -121,8 +143,8 @@ class MotionEditorWidget(QWidget):
         self.update_motion_name_combo()
 
     def _apply_filter_to_position_lists(self):
-        for appendix_type in appendix_types:
-            list_widget = getattr(self, '%s_positions_list' % appendix_type)
+        for group_type in self.robot_config.group_types():
+            list_widget = self.list_widgets[group_type]
             for row in range(list_widget.count()):
                 item = list_widget.item(row)
                 hidden = self.filter_positions_check.isChecked() and re.search(self._filter_pattern, item.text()) is None
@@ -151,14 +173,14 @@ class MotionEditorWidget(QWidget):
         combo.setCurrentIndex(motion_index)
 
     def update_positions_lists(self, positions):
-        for appendix_type in appendix_types:
-            list_widget = getattr(self, '%s_positions_list' % appendix_type)
+        for group_type in self.robot_config.group_types():
+            list_widget = self.list_widgets[group_type]
             list_widget.clear()
-            for name, position in positions[appendix_type].items():
+            for name, position in positions[group_type].items():
                 item = QListWidgetItem(name)
                 item._data = position
                 item._text = name
-                item._type = appendix_type
+                item._type = group_type
                 list_widget.addItem(item)
         self._apply_filter_to_position_lists()
 
@@ -174,36 +196,37 @@ class MotionEditorWidget(QWidget):
     def head_positions_list_context_menu(self, pos):
         self.positions_list_context_menu('head', pos)
 
-    def positions_list_context_menu(self, appendix_type, pos):
-        list_widget = getattr(self, '%s_positions_list' % appendix_type)
+    def positions_list_context_menu(self, group_type, pos):
+        list_widget = self.list_widgets[group_type]
         list_item = list_widget.itemAt(pos)
         if list_item is None:
             return
 
         menu = QMenu()
         move_to = {}
-        for appendix_name in appendix_names:
-            if list_item._type in appendix_name:
-                move_to[menu.addAction('move "%s"' % appendix_name)] = appendix_name
+        for group in self.robot_config.group_list():
+            if list_item._type == group.group_type:
+                move_to[menu.addAction('move "%s"' % group.name)] = group.name
         result = menu.exec_(list_widget.mapToGlobal(pos))
+        print 'result:', result
         if result in move_to:
-            appendix_name = move_to[result]
-            target_positions = adapt_to_side(appendix_name, list_item._data)
-            self._motion_publisher.move_to_position(appendix_name, target_positions, self.time_factor_spin.value())
-            print 'Moving %s to: %s' % (appendix_name, target_positions)
+            group_name = move_to[result]
+            target_positions = self.robot_config.groups[group_name].adapt_to_side(list_item._data)
+            self._motion_publisher.move_to_position(group_name, target_positions, self.time_factor_spin.value())
+            print 'Moving %s to: %s' % (group_name, target_positions)
 
     def get_motion_from_timeline(self):
         motion = {}
-        for appendix_name, clips in self._timeline_widget.scene().clips().items():
-            motion[appendix_name] = []
+        for group_name, clips in self._timeline_widget.scene().clips().items():
+            motion[group_name] = []
             for clip in clips:
                 pose = {
                     'name': clip.text(),
                     'starttime': clip.starttime(),
                     'duration': clip.duration(),
-                    'positions': adapt_to_side(appendix_name, clip.data()),
+                    'positions': self.robot_config.groups[group_name].adapt_to_side(clip.data()),
                 }
-                motion[appendix_name].append(pose)
+                motion[group_name].append(pose)
         return motion
 
     @Slot()
