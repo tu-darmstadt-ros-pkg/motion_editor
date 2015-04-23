@@ -39,7 +39,7 @@ class MotionPublisher(object):
 
     def get_current_positions(self, group):
         try:
-            joint_ids = [self._joint_state.name.index(joint_name) for joint_name in group.joints]
+            joint_ids = [self._joint_state.name.index(joint_name) for joint_name in group.joints_sorted()]
         except ValueError as e:
             print 'Error: Some joint was not found in received joint state:\n%s' % e
             return None
@@ -74,7 +74,7 @@ class TrajectoryPublisher(object):
     def publish_trajectory(self, current_positions, motion_list, time_factor = 1.0):
         self._trajectory.header.stamp = rospy.Time.now()
         self._trajectory.header.seq += 1
-        self._trajectory.joint_names = self._group.joints
+        self._trajectory.joint_names = self._group.joints_sorted()
         self._trajectory.points = []
         start_pose = {
             'name': 'current',

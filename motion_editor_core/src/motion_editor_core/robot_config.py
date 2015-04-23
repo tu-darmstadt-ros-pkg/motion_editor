@@ -49,12 +49,13 @@ class RobotConfigLoader():
                         print 'Group node has incomplete attributes:', e
                         return False
                     self.robot_config.add_group(group)
-                    for joint_node in group_node:
+                    for i, joint_node in enumerate(group_node):
                         if joint_node.tag != 'joint':
                             print 'Expected "joint" tag but found', joint_node.tag
                             return False
                         try:
                             joint = Joint(joint_node.attrib['name'])
+                            joint.id = i
                         except KeyError as e:
                             print 'Joint node has incomplete attributes:', e
                             return False
@@ -138,6 +139,9 @@ class JointGroup():
     def joint_list(self):
         return list(self.joints.itervalues())
 
+    def joints_sorted(self):
+        return sorted(self.joints, key=lambda joint_name: self.joints[joint_name].id)
+
     def adapt_to_side(self, positions):
         return [-position if joint.mirrored else position for joint, position in zip(self.joint_list(), positions)]
 
@@ -152,6 +156,7 @@ class Joint():
     def __init__(self, name, mirrored=False):
         self.name = name
         self.mirrored = mirrored
+        self.id = 0
 
     def __str__(self):
         return self.name + (' [mirrored]' if self.mirrored else '')
