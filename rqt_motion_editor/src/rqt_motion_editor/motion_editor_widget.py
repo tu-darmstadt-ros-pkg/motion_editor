@@ -208,7 +208,6 @@ class MotionEditorWidget(QWidget):
             if list_item._type == group.group_type:
                 move_to[menu.addAction('move "%s"' % group.name)] = group.name
         result = menu.exec_(list_widget.mapToGlobal(pos))
-        print 'result:', result
         if result in move_to:
             group_name = move_to[result]
             target_positions = self.robot_config.groups[group_name].adapt_to_side(list_item._data)

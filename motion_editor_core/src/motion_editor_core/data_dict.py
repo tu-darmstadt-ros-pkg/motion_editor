@@ -10,6 +10,11 @@ class DataDict(dict):
 
     def __init__(self, data_path, data_type_name, clean_up=False):
         super(DataDict, self).__init__()
+        try:
+            os.makedirs(data_path)
+        except OSError:
+            if not os.path.isdir(data_path):
+                raise
         self._data_path = data_path
         self._data_type_name = data_type_name
         self._load(clean_up)

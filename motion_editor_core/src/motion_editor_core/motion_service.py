@@ -5,15 +5,25 @@ from motion_editor_core.srv import ExecuteMotion, ExecuteMotionResponse
 from .motion_publisher import MotionPublisher
 from .motion_data import MotionData
 from motion_editor_core.msg import ExecuteMotionCommand
+from .robot_config import RobotConfigLoader
+
 
 class MotionService(object):
-
     def __init__(self):
-        self._motion_publisher = MotionPublisher()
-        self._motion_publisher.set_subscriber_prefix('/thor_mang')
-        self._motion_publisher.set_publisher_prefix('/thor_mang')
-        self._motion_data = MotionData()
-        self.motion_command_sub = rospy.Subscriber('/thor_mang/motion_service/motion_command', ExecuteMotionCommand, self.motionCommandRequestCallbackFnc)
+        config_loader = RobotConfigLoader()
+        try:
+            robot_config_name = rospy.get_param('/motion_service/robot_config')
+        except KeyError:
+            rospy.logwarn('Could not find robot config param in /motion_service/robot_config. Using default config for '
+                          'Thor Mang.')
+            robot_config_name = 'thor'
+        config_loader.load_xml_by_name(robot_config_name + '_config.xml')
+        if len(config_loader.targets) > 0:
+            self._motion_publisher = MotionPublisher(config_loader.robot_config, config_loader.targets[0].joint_state_topic, config_loader.targets[0].publisher_prefix)
+        else:
+            rospy.logerr('Robot config needs to contain at least one valid target.')
+        self._motion_data = MotionData(config_loader.robot_config)
+        self.motion_command_sub = rospy.Subscriber('/thor_mang/motion_service/motion_command', ExecuteMotionCommand, self.motion_command_request_cb)
 
     def _execute_motion(self, request):
         response = ExecuteMotionResponse()
@@ -53,13 +63,14 @@ class MotionService(object):
         print 'MotionService: Waiting for calls...'
         rospy.spin()
 
-    def motionCommandRequestCallbackFnc(self, command):
+    def motion_command_request_cb(self, command):
         print "Initiate motion command via topic ..."
         request = ExecuteMotion()
         request.motion_name = command.motion_name
         request.time_factor = command.time_factor
         self._execute_motion(request)
         print "Motion command complete"
+
 
 def main():
     motion_service = MotionService()

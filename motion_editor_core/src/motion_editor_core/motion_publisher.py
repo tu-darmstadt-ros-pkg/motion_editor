@@ -13,6 +13,7 @@ class MotionPublisher(object):
     def __init__(self, robot_config, joint_state_topic, publisher_prefix):
         self._joint_state = JointState()
         self._state_subscriber = rospy.Subscriber(joint_state_topic, JointState, self._state_callback)
+        print 'Subscribing to', joint_state_topic
         self.robot_config = robot_config
 
         self._trajectory_publishers = {}
