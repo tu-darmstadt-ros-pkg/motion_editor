@@ -143,7 +143,7 @@ class JointGroup():
         return sorted(self.joints, key=lambda joint_name: self.joints[joint_name].id)
 
     def adapt_to_side(self, positions):
-        return [-position if joint.mirrored else position for joint, position in zip(self.joint_list(), positions)]
+        return [-position if self.joints[joint_name].mirrored else position for joint_name, position in zip(self.joints_sorted(), positions)]
 
     def __str__(self):
         neat_string = 'Group name: ' + self.name + ' Type: ' + self.group_type + '\n'
