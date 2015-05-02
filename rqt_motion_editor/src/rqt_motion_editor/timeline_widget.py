@@ -350,22 +350,18 @@ class TimelineScene(QGraphicsScene):
         try:
             list_item = event.source().selectedItems()[0]
         except:
-            print 'Error: dragMoveEvent: no items:', event.source().selectedItems()
+            print '[Motion Editor] Error: dragMoveEvent: no items:', event.source().selectedItems()
             return event.ignore()
 
         if False in [hasattr(list_item, attr) for attr in ('_type', '_data', '_text')]:
-            print 'Error: dragMoveEvent: wrong item:', list_item
+            print '[Motion Editor] Error: dragMoveEvent: wrong item:', list_item
             return event.ignore()
-
-        #print 'dragMoveEvent', list_item._text
 
         starttime = max(0.0, event.scenePos().x())
         track = self.track_at(event.scenePos().y())
         if track is None:
-            #print 'Info: dragMoveEvent: ignoring because no track at y:', event.scenePos().y()
             return event.ignore()
         if track.track_type() != list_item._type:
-            #print 'Info: dragMoveEvent: ignoring because of wrong track type: "%s" != "%s"' % (track.track_type(), list_item._type)
             return event.ignore()
 
         # if there is already an item, highlight it
@@ -381,13 +377,11 @@ class TimelineScene(QGraphicsScene):
             duration = min(duration, next_clip.starttime() - starttime)
         # if duration is smaller than 0.1, don't accept this drop
         if duration < 0.1:
-            #print 'Info: dragMoveEvent: ignoring because not enough space to next clip:', duration
             return event.ignore()
 
         # add drag item
         self._drag_clip = track.add_clip(list_item._text, starttime, duration, list_item._data)
         return event.acceptProposedAction()
-
 
     def clear_drag_drop_clips(self):
         # remove drag item from timeline
@@ -399,10 +393,8 @@ class TimelineScene(QGraphicsScene):
             self._drop_clip.set_highlight(False)
             self._drop_clip = None
 
-
     def dragLeaveEvent(self, event):
         self.clear_drag_drop_clips()
-
 
     def dropEvent(self, event):
         # let drag item stay in the timeline
@@ -428,7 +420,6 @@ class TimelineView(QGraphicsView):
         self.setScene(TimelineScene())
         self.show_time(0.0, 10.0)
 
-
     def show_time(self, time=None, duration=None):
         visible_rect = self.mapToScene(self.viewport().geometry()).boundingRect()
         if time is None:
@@ -437,10 +428,8 @@ class TimelineView(QGraphicsView):
             duration = visible_rect.width()
         self.fitInView(time, self.sceneRect().y(), duration, self.sceneRect().height())
 
-
     def resizeEvent(self, event):
         self.show_time()
-
 
     def wheelEvent(self, event):
         # create a wheel event with a delta value scaled to the current zoom level
@@ -486,12 +475,10 @@ class TimelineWidget(QWidget):
         self._add_track_label('time')
         self.scene = self._timeline_view.scene
 
-
     def add_track(self, track_name, track_type):
         track = self._timeline_view.scene().add_track(track_name, track_type)
         self._add_track_label(track_name, track._colors['track'])
         return track
-
 
     def _add_track_label(self, track_name, background_color=None):
         label = QLabel(track_name)
@@ -518,7 +505,6 @@ if __name__ == '__main__':
         widget._timeline_view.scene().add_clip(track_name, '%s_2' % track_name, 3.0, 1.0, {})
         widget._timeline_view.scene().add_clip(track_name, '%s_3' % track_name, 5.0, 1.5, {})
 
-    # test TimelineMarker
     time = 0.0
     interval = 0.03
     marker = widget._timeline_view.scene().add_marker(time)
@@ -529,7 +515,6 @@ if __name__ == '__main__':
         if time < 10.0:
             marker.set_time(time)
             QTimer.singleShot(int(interval * 1000), move_marker)
-    #move_marker()
 
     widget.show()
     app.exec_()

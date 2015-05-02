@@ -59,7 +59,7 @@ class MotionService(object):
 
     def start_server(self):
         rospy.init_node('motion_editor_core_service')
-        rospy.Service('thor_mang/motion_service/execute_motion', ExecuteMotion, self._execute_motion)
+        rospy.Service('/motion_service/execute_motion', ExecuteMotion, self._execute_motion)
         print '[MotionService] Waiting for calls...'
         rospy.spin()
 

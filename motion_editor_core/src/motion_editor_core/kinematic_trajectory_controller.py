@@ -10,6 +10,7 @@ from .joint_configuration import appendixes
 
 topic_prefix = '/thor_mang'
 
+
 class KinematicTrajectoryController(object):
 
     def __init__(self, appendix):
@@ -22,7 +23,6 @@ class KinematicTrajectoryController(object):
         self._state_subscriber = rospy.Subscriber('%s/joint_states' % (topic_prefix), JointState, self._state_callback)
         self._state_publisher = rospy.Publisher('%s/%s/joint_states' % (topic_prefix, self._appendix['controller_topic']), JointState)
         self._trajectory_subscriber = rospy.Subscriber('%s/%s/trajectory' % (topic_prefix, self._appendix['controller_topic']), JointTrajectory, self._trajectory_callback)
-
 
     def _execute_trajectorie(self, trajectory):
         if self._running:
@@ -58,14 +58,11 @@ class KinematicTrajectoryController(object):
 
         self._running = False
 
-
     def _trajectory_callback(self, trajectory):
         self._execute_trajectorie(trajectory)
 
-
     def _state_callback(self, joint_states):
         self._current_joint_states = joint_states
-
 
     def shutdown(self):
         self._state_publisher.unregister()

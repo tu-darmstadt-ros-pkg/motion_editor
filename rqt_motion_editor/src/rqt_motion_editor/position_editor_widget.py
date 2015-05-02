@@ -54,7 +54,7 @@ class PositionEditorWidget(QWidget):
         group = self.robot_config.groups[appendix_name]
         current_positions = self._motion_publisher.get_current_positions(group)
         current_positions = self.robot_config.groups[appendix_name].adapt_to_side(current_positions)
-        print 'Saving %s as "%s": %s' % (appendix_name, position_name, current_positions)
+        print '[Motion Editor] Saving %s as "%s": %s' % (appendix_name, position_name, current_positions)
         self._position_data[self.robot_config.groups[appendix_name].group_type].save(position_name, current_positions)
         self.position_list_updated.emit(self._position_data)
         self.on_save_appendix_combo_currentIndexChanged(appendix_name)
@@ -93,7 +93,7 @@ class PositionEditorWidget(QWidget):
         appendix_name = str(self.move_appendix_combo.currentText())
         target_positions = self._position_data[self.robot_config.groups[appendix_name].group_type][position_name]
         target_positions = self.robot_config.groups[appendix_name].adapt_to_side(target_positions)
-        print 'Moving %s to "%s": %s' % (appendix_name, position_name, target_positions)
+        print '[Motion Editor] Moving %s to "%s": %s' % (appendix_name, position_name, target_positions)
         self._motion_publisher.move_to_position(appendix_name, target_positions)
 
     def shutdown(self):

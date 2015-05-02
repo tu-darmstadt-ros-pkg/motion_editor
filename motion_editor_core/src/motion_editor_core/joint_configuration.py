@@ -1,4 +1,5 @@
-
+# This file is deprecated. Don't use it anymore to retrieve information about the robot
+# It is replaced by robot_config.py
 appendixes = (
     {'name': 'right_arm', 'joint_names': ('r_elbow', 'r_shoulder_pitch', 'r_shoulder_roll', 'r_shoulder_yaw', 'r_wrist_roll', 'r_wrist_yaw1', 'r_wrist_yaw2')},
     {'name': 'left_arm', 'joint_names': ('l_elbow', 'l_shoulder_pitch', 'l_shoulder_roll', 'l_shoulder_yaw', 'l_wrist_roll', 'l_wrist_yaw1', 'l_wrist_yaw2')},

@@ -134,7 +134,7 @@ class MotionEditorWidget(QWidget):
             return
         self._clear_playback_marker()
         self._motion_publisher.publish_motion(self._motion_data[motion_name], self.time_factor_spin.value())
-        print 'Running motion:', motion_name
+        print '[Motion Editor] Running motion:', motion_name
 
     @Slot(str)
     def on_filter_pattern_edit_textChanged(self, pattern):
@@ -212,7 +212,7 @@ class MotionEditorWidget(QWidget):
             group_name = move_to[result]
             target_positions = self.robot_config.groups[group_name].adapt_to_side(list_item._data)
             self._motion_publisher.move_to_position(group_name, target_positions, self.time_factor_spin.value())
-            print 'Moving %s to: %s' % (group_name, target_positions)
+            print '[Motion Editor] Moving %s to: %s' % (group_name, target_positions)
 
     def get_motion_from_timeline(self):
         motion = {}
@@ -230,7 +230,7 @@ class MotionEditorWidget(QWidget):
 
     @Slot()
     def on_run_timeline_button_clicked(self):
-        print 'Running timeline.'
+        print '[Motion Editor] Running timeline.'
         self._playback_duration = 0.0
         for clips in self._timeline_widget.scene().clips().values():
             if len(clips) > 0 and self._playback_duration < clips[-1].endtime():
