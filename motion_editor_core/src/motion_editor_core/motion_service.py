@@ -30,7 +30,7 @@ class MotionService(object):
 
         # check if a motion with this name exists
         if request.motion_name not in self._motion_data:
-            print 'MotionService: unknown motion name: "%s"' % request.motion_name
+            print '[MotionService] Unknown motion name: "%s"' % request.motion_name
 
             response.ok = False
             response.finish_time.data = rospy.Time.now()
@@ -49,7 +49,7 @@ class MotionService(object):
         motion_duration *= request.time_factor
 
         # execute motion
-        print 'MotionService: Executing motion: "%s" (time factor: %.3f, duration %.2fs)' % (request.motion_name, request.time_factor, motion_duration)
+        print '[MotionService] Executing motion: "%s" (time factor: %.3f, duration %.2fs)' % (request.motion_name, request.time_factor, motion_duration)
         self._motion_publisher.publish_motion(self._motion_data[request.motion_name], request.time_factor)
 
         # reply with ok and the finish_time of this motion
@@ -60,16 +60,16 @@ class MotionService(object):
     def start_server(self):
         rospy.init_node('motion_editor_core_service')
         rospy.Service('thor_mang/motion_service/execute_motion', ExecuteMotion, self._execute_motion)
-        print 'MotionService: Waiting for calls...'
+        print '[MotionService] Waiting for calls...'
         rospy.spin()
 
     def motion_command_request_cb(self, command):
-        print "Initiate motion command via topic ..."
+        print "[MotionService] Initiate motion command via topic ..."
         request = ExecuteMotion()
         request.motion_name = command.motion_name
         request.time_factor = command.time_factor
         self._execute_motion(request)
-        print "Motion command complete"
+        print "[MotionService] Motion command complete"
 
 
 def main():

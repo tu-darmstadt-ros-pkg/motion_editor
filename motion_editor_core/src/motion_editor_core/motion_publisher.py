@@ -13,7 +13,7 @@ class MotionPublisher(object):
     def __init__(self, robot_config, joint_state_topic, publisher_prefix):
         self._joint_state = JointState()
         self._state_subscriber = rospy.Subscriber(joint_state_topic, JointState, self._state_callback)
-        print 'Subscribing to', joint_state_topic
+        print '[Motion Editor] Subscribing to', joint_state_topic
         self.robot_config = robot_config
 
         self._trajectory_publishers = {}
@@ -41,7 +41,7 @@ class MotionPublisher(object):
         try:
             joint_ids = [self._joint_state.name.index(joint_name) for joint_name in group.joints_sorted()]
         except ValueError as e:
-            print 'Error: Some joint was not found in received joint state:\n%s' % e
+            print '[Motion Editor] Error: Some joint was not found in received joint state:\n%s' % e
             return None
         current_positions = [round(self._joint_state.position[joint_id], self._precision) for joint_id in joint_ids]
         return current_positions
@@ -62,7 +62,7 @@ class TrajectoryPublisher(object):
         self._trajectory = JointTrajectory()
         self._publisher_prefix = publisher_prefix
         self._publisher = rospy.Publisher('%s/%s' % (self._publisher_prefix, self._group.topic), JointTrajectory, queue_size=1000)
-        print 'Publishing to topic:', '%s/%s' % (self._publisher_prefix, self._group.topic)
+        print '[Motion Editor] Publishing to topic:', '%s/%s' % (self._publisher_prefix, self._group.topic)
 
     def _add_point(self, time, positions):
         point = JointTrajectoryPoint()

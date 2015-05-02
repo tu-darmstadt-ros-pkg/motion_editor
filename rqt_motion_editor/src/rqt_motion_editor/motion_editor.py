@@ -29,10 +29,7 @@ class MotionEditorPlugin(Plugin):
             rospy.logwarn('Could not find robot config param in /motion_editor/robot_config. Using default config for '
                           'Thor Mang.')
             robot_config_name = 'thor'
-        print 'loading robot config'
         config_loader.load_xml_by_name(robot_config_name + '_config.xml')
-        print config_loader.robot_config
-        print 'finished loading robot config'
 
         motion_publishers = {}
         for target in config_loader.targets:

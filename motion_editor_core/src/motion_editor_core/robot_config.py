@@ -30,34 +30,34 @@ class RobotConfigLoader():
 
     def parse_xml(self, root):
         if root.tag != 'config':
-            print 'Motion editor config should start with a "config" node.'
+            print '[Motion Editor] Motion editor config should start with a "config" node.'
             return False
         for robot_node in root:
             if robot_node.tag == 'robot':
                 try:
                     self.robot_config = RobotConfig(robot_node.attrib['name'])
                 except KeyError as e:
-                    print 'Robot node has incomplete attributes:', e
+                    print '[Motion Editor] Robot node has incomplete attributes:', e
                     return False
                 for group_node in robot_node:
                     if group_node.tag != 'group':
-                        print 'Expected "group" tag but found', group_node.tag
+                        print '[Motion Editor] Expected "group" tag but found', group_node.tag
                         return False
                     try:
                         group = JointGroup(group_node.attrib['name'], group_node.attrib['type'], group_node.attrib['topic'])
                     except KeyError as e:
-                        print 'Group node has incomplete attributes:', e
+                        print '[Motion Editor] Group node has incomplete attributes:', e
                         return False
                     self.robot_config.add_group(group)
                     for i, joint_node in enumerate(group_node):
                         if joint_node.tag != 'joint':
-                            print 'Expected "joint" tag but found', joint_node.tag
+                            print '[Motion Editor] Expected "joint" tag but found', joint_node.tag
                             return False
                         try:
                             joint = Joint(joint_node.attrib['name'])
                             joint.id = i
                         except KeyError as e:
-                            print 'Joint node has incomplete attributes:', e
+                            print '[Motion Editor] Joint node has incomplete attributes:', e
                             return False
                         joint.mirrored = group_node.attrib.get('mirrored', "false") == 'true' or \
                             joint_node.attrib.get('mirrored', "false") == 'true'
@@ -68,11 +68,11 @@ class RobotConfigLoader():
                                           robot_node.attrib['publish_prefix'],
                                           robot_node.attrib['joint_state_topic'])
                 except KeyError as e:
-                    print "MotionTarget node has incomplete attributes:", e
+                    print "[Motion Editor] MotionTarget node has incomplete attributes:", e
                     return False
                 self.targets.append(target)
             else:
-                print 'Expected "robot" or "target" tag. Found:', robot_node.tag
+                print '[Motion Editor] Expected "robot" or "target" tag. Found:', robot_node.tag
                 return False
         return True
 

@@ -14,9 +14,7 @@ class MotionData(DataDict):
 
 
 def import_and_clean_up():
-    motion_data = MotionData(clean_up=True)
-    print motion_data.keys()
-
+    MotionData(clean_up=True)
 
 if __name__ == '__main__':
     import_and_clean_up()
