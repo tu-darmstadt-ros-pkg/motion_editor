@@ -51,5 +51,6 @@
 	</robot>
 
 	<target name="Thor" joint_state_topic="/thor_mang/joint_states" publish_prefix="/thor_mang"/>
-	<!--<target name="Ghost" sub="/thor_mang" pub="/thor_mang"/> -->
+	<target name="Ghost" joint_state_topic="/flor/ghost/get_joint_states" publish_prefix="/flor/ghost"/>
+"
 </config>

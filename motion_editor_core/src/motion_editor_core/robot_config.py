@@ -84,7 +84,7 @@ class MotionTarget():
         self.joint_state_topic = joint_state_topic
 
     def __str__(self):
-        return 'MotionTarget(name=%s, pub=%s, sub=%s)' % (self.name, self.publisher_prefix, self.joint_state_topic)
+        return 'MotionTarget(name=%s, publisher_prefix=%s, joint_state_topic=%s)' % (self.name, self.publisher_prefix, self.joint_state_topic)
 
 
 class RobotConfig():
