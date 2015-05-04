@@ -206,13 +206,15 @@ class MotionEditorWidget(QWidget):
         move_to = {}
         for group in self.robot_config.group_list():
             if list_item._type == group.group_type:
-                move_to[menu.addAction('move "%s"' % group.name)] = group.name
+                move_to[menu.addAction('move "%s"' % group.name)] = [group.name]
+        move_to[menu.addAction('move all')] = list(move_to.itervalues())
         result = menu.exec_(list_widget.mapToGlobal(pos))
         if result in move_to:
-            group_name = move_to[result]
-            target_positions = self.robot_config.groups[group_name].adapt_to_side(list_item._data)
-            self._motion_publisher.move_to_position(group_name, target_positions, self.time_factor_spin.value())
-            print '[Motion Editor] Moving %s to: %s' % (group_name, target_positions)
+            group_names = move_to[result]
+            for group_name in group_names:
+                target_positions = self.robot_config.groups[group_name].adapt_to_side(list_item._data)
+                self._motion_publisher.move_to_position(group_name, target_positions, self.time_factor_spin.value())
+                print '[Motion Editor] Moving %s to: %s' % (group_name, target_positions)
 
     def get_motion_from_timeline(self):
         motion = {}
