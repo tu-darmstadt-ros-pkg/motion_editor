@@ -207,7 +207,8 @@ class MotionEditorWidget(QWidget):
         for group in self.robot_config.group_list():
             if list_item._type == group.group_type:
                 move_to[menu.addAction('move "%s"' % group.name)] = [group.name]
-        move_to[menu.addAction('move all')] = list(move_to.itervalues())
+        # move_to[menu.addAction('move all')] = list(move_to.itervalues())
+        move_to[menu.addAction('move all')] = [group_list[0] for group_list in list(move_to.itervalues())]
         result = menu.exec_(list_widget.mapToGlobal(pos))
         if result in move_to:
             group_names = move_to[result]
