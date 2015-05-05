@@ -22,8 +22,8 @@
 	  </group>
 
           <group name="head" type="head" topic="head_traj_controller/command">
-            <joint name="head_tilt"/>
             <joint name="head_pan"/>
+            <joint name="head_tilt"/>
           </group>
 
           <group name="torso" type="torso" topic="torso_traj_controller/command">
