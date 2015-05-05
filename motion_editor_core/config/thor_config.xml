@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <config>
 	<robot name="thor">
-	  <group name="right_arm" type="arm" topic="right_arm_traj_controller/command">
+	  <group name="right_arm" type="arm" topic="right_arm_traj_controller">
 	    <joint name="r_elbow"/>
 	    <joint name="r_shoulder_pitch"/>
 	    <joint name="r_shoulder_roll"/>
@@ -11,7 +11,7 @@
 	    <joint name="r_wrist_yaw2"/>    
 	  </group>
 
-	  <group name="left_arm" type="arm" mirrored="true" topic="left_arm_traj_controller/command">
+	  <group name="left_arm" type="arm" mirrored="true" topic="left_arm_traj_controller">
 	    <joint name="l_elbow"/>
 	    <joint name="l_shoulder_pitch"/>
 	    <joint name="l_shoulder_roll"/>
@@ -21,17 +21,17 @@
 	    <joint name="l_wrist_yaw2"/>
 	  </group>
 
-          <group name="head" type="head" topic="head_traj_controller/command">
+          <group name="head" type="head" topic="head_traj_controller">
             <joint name="head_pan"/>
             <joint name="head_tilt"/>
           </group>
 
-          <group name="torso" type="torso" topic="torso_traj_controller/command">
+          <group name="torso" type="torso" topic="torso_traj_controller">
             <joint name="waist_pan"/>
             <joint name="waist_tilt"/>
           </group>
 
-	  <group name="right_leg" type="leg" topic="right_leg_traj_controller/command">
+	  <group name="right_leg" type="leg" topic="right_leg_traj_controller">
 	    <joint name="r_hip_yaw"/>
 	    <joint name="r_hip_roll"/>
 	    <joint name="r_hip_pitch"/>
@@ -40,7 +40,7 @@
 	    <joint name="r_ankle_roll"/>  
 	  </group>
 
-	  <group name="left_leg" type="leg" mirrored="true" topic="left_leg_traj_controller/command">
+	  <group name="left_leg" type="leg" mirrored="true" topic="left_leg_traj_controller">
 	    <joint name="l_hip_yaw"/>
 	    <joint name="l_hip_roll"/>
 	    <joint name="l_hip_pitch"/>
