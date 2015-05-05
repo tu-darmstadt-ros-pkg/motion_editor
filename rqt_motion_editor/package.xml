@@ -14,8 +14,7 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <export>
-
     <rqt_gui plugin="${prefix}/plugin.xml"/>
-
   </export>
+  
 </package>
