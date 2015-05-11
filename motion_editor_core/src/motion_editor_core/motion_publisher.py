@@ -71,7 +71,6 @@ class MotionPublisher(object):
         self._traj_finished[group_name] = (True, error_code)
         if cb_func is not None and len([group for group in self._traj_finished.itervalues() if group[0] is False]) == 0:
             cb_func([group[1] for group in self._traj_finished.itervalues()], list(self._traj_finished.iterkeys()))
-        print 'Trajectory for %s finished with error code: %s' % (group_name, error_code)
 
 
 class TrajectoryPublisher(object):
@@ -139,9 +138,6 @@ class TrajectoryPublisher(object):
 
     def publish_trajectory_msg(self):
         self._publisher.publish(self._trajectory)
-
-    def _trajectory_finished_cb(self, state, result):
-        print 'Trajectory for %s finished. Error code: %s, State: %s, Error string: %s' % (self._group.name, result.error_code, state, result.error_string)
 
     def shutdown(self):
         self._publisher.unregister()

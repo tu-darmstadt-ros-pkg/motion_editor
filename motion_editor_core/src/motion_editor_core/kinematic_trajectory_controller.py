@@ -71,15 +71,15 @@ def main():
     rospy.init_node('kinematic_trajectory_controller')
     config_loader = RobotConfigLoader()
     try:
-        robot_config_name = rospy.get_param('robot_config')
+        robot_config_name = rospy.get_param(rospy.get_name() + '/robot_config')
     except KeyError:
-        rospy.logwarn('[KinematicTrajectoryController] Could not find robot config param in ' + rospy.get_namespace() + '/robot_config. '
+        rospy.logwarn('[KinematicTrajectoryController] Could not find robot config param in ' + rospy.get_name() + '/robot_config. '
                       'Using default config for Thor Mang.')
         robot_config_name = 'thor'
     try:
-        cmd_topic = rospy.get_param('cmd_topic')
+        cmd_topic = rospy.get_param(rospy.get_name() + '/cmd_topic')
     except KeyError:
-        rospy.logwarn('[KinematicTrajectoryController] Could not find cmd_topic param in ' + rospy.get_namespace() + '/robot_config. '
+        rospy.logwarn('[KinematicTrajectoryController] Could not find cmd_topic param in ' + rospy.get_name() + '/robot_config. '
                       'Using default "/flor/ghost/set_joint_states".')
         cmd_topic = '/flor/ghost/set_joint_states'
     config_loader.load_xml_by_name(robot_config_name + '_config.xml')
