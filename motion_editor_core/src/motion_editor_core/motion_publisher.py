@@ -20,8 +20,10 @@ class MotionPublisher(object):
         self.robot_config = robot_config
 
         self._trajectory_publishers = {}
+        self._traj_finished = dict()
         for group in self.robot_config.group_list():
             self._trajectory_publishers[group.name] = TrajectoryPublisher(group, publisher_prefix)
+            self._traj_finished[group.name] = (True, 0)
 
     def move_to_position(self, appendix_name, target_position, duration=1.0):
         target_pos = {
@@ -38,9 +40,15 @@ class MotionPublisher(object):
             motion_list = motion.get(group.name, [])
             current_positions = self.get_current_positions(group)
             if len(motion_list) > 0 and current_positions is not None:
+                self._traj_finished[group.name] = (False, 0)
                 self._trajectory_publishers[group.name].publish_trajectory(
                     current_positions, motion_list, time_factor=time_factor,
-                    cb_func=(lambda error_code, group_name=group.name: self.trajectory_finished(group_name, error_code)))
+                    cb_func=(lambda error_code, group_name=group.name: self.trajectory_finished(group_name, error_code, cb_func)))
+
+    def stop_motion(self):
+        print '[MotionEditor] Stop motion requested.'
+        for group_name in self.robot_config.groups:
+            self._trajectory_publishers[group_name].stop_trajectory()
 
     def get_current_positions(self, group):
         try:
@@ -59,7 +67,10 @@ class MotionPublisher(object):
             self._trajectory_publishers[group_name].shutdown()
         self._state_subscriber.unregister()
 
-    def trajectory_finished(self, group_name, error_code):
+    def trajectory_finished(self, group_name, error_code, cb_func):
+        self._traj_finished[group_name] = (True, error_code)
+        if cb_func is not None and len([group for group in self._traj_finished.itervalues() if group[0] is False]) == 0:
+            cb_func([group[1] for group in self._traj_finished.itervalues()], list(self._traj_finished.iterkeys()))
         print 'Trajectory for %s finished with error code: %s' % (group_name, error_code)
 
 
@@ -109,6 +120,10 @@ class TrajectoryPublisher(object):
             time = motion['starttime'] * time_factor + motion['duration'] * time_factor
             self._add_point(time, motion['positions'])
             last_motion = motion
+
+    def stop_trajectory(self):
+        self._client.cancel_all_goals()
+        print '[MotionEditor] Goal has been cancelled.'
 
     def publish_trajectory(self, current_positions, motion_list, time_factor=1.0, cb_func=None):
         self._build_trajectory_msg(current_positions, motion_list, time_factor)

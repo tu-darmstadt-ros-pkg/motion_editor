@@ -79,7 +79,7 @@ i.e. show only names that start with &quot;vi_&quot; or contain &quot;back&quot;
          <property name="title">
           <string>Motion</string>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,3">
+         <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,3,0">
           <property name="spacing">
            <number>0</number>
           </property>
@@ -201,6 +201,13 @@ i.e. show only names that start with &quot;vi_&quot; or contain &quot;back&quot;
             </property>
             <property name="text">
              <string>Run Timeline</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="stop_motion_button">
+            <property name="text">
+             <string>Stop Motion</string>
             </property>
            </widget>
           </item>

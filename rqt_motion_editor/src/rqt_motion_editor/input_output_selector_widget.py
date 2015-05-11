@@ -48,5 +48,8 @@ class InputOutputSelectorWidget(QWidget):
     def publish_motion(self, *args, **kwargs):
         return self._selected_publisher['output'].publish_motion(*args, **kwargs)
 
+    def stop_motion(self, *args, **kwargs):
+        return self._selected_publisher['output'].stop_motion(*args, **kwargs)
+
     def shutdown(self):
         pass

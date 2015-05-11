@@ -57,6 +57,8 @@ class MotionEditorWidget(QWidget):
 
         self.update_motion_name_combo()
 
+        self.stop_motion_button.pressed.connect(self._motion_publisher.stop_motion)
+
     def set_context_entry(self, list_widget, group_type):
         pass
 

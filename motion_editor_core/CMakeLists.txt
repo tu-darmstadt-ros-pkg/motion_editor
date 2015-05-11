@@ -5,6 +5,8 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
+  actionlib
+  actionlib_msgs
 )
 
 catkin_python_setup()
@@ -19,8 +21,13 @@ add_service_files(
   ExecuteMotion.srv
 )
 
+add_action_files(
+  DIRECTORY action 
+  FILES ExecuteMotion.action)
+
 generate_messages(
   DEPENDENCIES
+  actionlib_msgs
   std_msgs
 )
 
