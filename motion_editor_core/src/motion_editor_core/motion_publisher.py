@@ -122,7 +122,6 @@ class TrajectoryPublisher(object):
 
     def stop_trajectory(self):
         self._client.cancel_all_goals()
-        print '[MotionEditor] Goal has been cancelled.'
 
     def publish_trajectory(self, current_positions, motion_list, time_factor=1.0, cb_func=None):
         self._build_trajectory_msg(current_positions, motion_list, time_factor)
