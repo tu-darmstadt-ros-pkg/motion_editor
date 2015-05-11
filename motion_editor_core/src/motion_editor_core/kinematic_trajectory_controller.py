@@ -21,7 +21,7 @@ class KinematicTrajectoryController(object):
         self._state_publisher = rospy.Publisher(joint_cmd_topic, JointState, queue_size=1000)
         self._trajectory_subscriber = rospy.Subscriber(subscriber_prefix + '/' + group.topic + '/command', JointTrajectory, self._trajectory_callback)
 
-    def _execute_trajectorie(self, trajectory):
+    def _execute_trajectory(self, trajectory):
         if self._running:
             return
         self._running = True
@@ -56,7 +56,7 @@ class KinematicTrajectoryController(object):
         self._running = False
 
     def _trajectory_callback(self, trajectory):
-        self._execute_trajectorie(trajectory)
+        self._execute_trajectory(trajectory)
 
     def _state_callback(self, joint_states):
         self._current_joint_states = joint_states
