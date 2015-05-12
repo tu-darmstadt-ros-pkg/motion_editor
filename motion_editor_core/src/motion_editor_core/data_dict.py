@@ -58,3 +58,7 @@ class DataDict(dict):
         print '[Motion Editor] Info: deleting %s file "%s"' % (self._data_type_name, os.path.basename(data_file_name))
         os.remove(data_file_name)
         del self[data_name]
+
+    def move(self, old_name, new_name):
+        self.save(new_name, self[old_name])
+        self.delete(old_name)
