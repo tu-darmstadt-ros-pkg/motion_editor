@@ -82,7 +82,7 @@ class TrajectoryPublisher(object):
         self._publisher = rospy.Publisher('%s/%s/command' % (self._publisher_prefix, self._group.topic), JointTrajectory, queue_size=1000)
         # print '[Motion Editor] Publishing to topic:', '%s/%s' % (self._publisher_prefix, self._group.topic)
         self._client = actionlib.SimpleActionClient('%s/%s/follow_joint_trajectory' % (self._publisher_prefix, self._group.topic), FollowJointTrajectoryAction)
-        if self._client.wait_for_server(timeout=rospy.Duration(0.5)):
+        if self._client.wait_for_server(timeout=rospy.Duration(1)):
             self._found_action_server = True
         else:
             self._found_action_server = False
