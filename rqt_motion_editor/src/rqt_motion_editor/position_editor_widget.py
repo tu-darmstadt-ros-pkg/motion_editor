@@ -96,5 +96,9 @@ class PositionEditorWidget(QWidget):
         print '[Motion Editor] Moving %s to "%s": %s' % (appendix_name, position_name, target_positions)
         self._motion_publisher.move_to_position(appendix_name, target_positions)
 
+    def on_position_renamed(self, item):
+        self._position_data[item._type].move(item._text, item.text())
+        item._text = item.text()
+
     def shutdown(self):
         pass

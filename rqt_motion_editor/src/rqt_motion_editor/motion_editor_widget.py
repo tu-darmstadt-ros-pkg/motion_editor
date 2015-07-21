@@ -4,7 +4,7 @@ import rospy
 import os
 import re
 from python_qt_binding import loadUi
-from python_qt_binding.QtCore import Slot, QTimer, Qt
+from python_qt_binding.QtCore import Slot, QTimer, Qt, Signal
 from python_qt_binding.QtGui import QApplication, QWidget, QListWidgetItem, QMessageBox, QMenu, QLabel, QListWidget, QAbstractItemView, QPalette, QColor
 
 from motion_editor_core.motion_data import MotionData
@@ -12,6 +12,8 @@ from timeline_widget import TimelineWidget
 
 
 class MotionEditorWidget(QWidget):
+
+    position_renamed = Signal(QListWidgetItem)
 
     def __init__(self, motion_publisher, robot_config):
         super(MotionEditorWidget, self).__init__()
@@ -34,6 +36,7 @@ class MotionEditorWidget(QWidget):
             list_widget.customContextMenuRequested.connect(
                 lambda pos, _group_type=group_type: self.positions_list_context_menu(_group_type, pos)
             )
+            list_widget.itemChanged.connect(self.on_list_item_changed)
 
             self.position_lists_layout.addWidget(list_widget)
             self.list_widgets[group_type] = list_widget
@@ -57,8 +60,15 @@ class MotionEditorWidget(QWidget):
 
         self.update_motion_name_combo()
 
-    def set_context_entry(self, list_widget, group_type):
-        pass
+        self.stop_motion_button.pressed.connect(self.on_motion_stop_pressed)
+
+    def on_list_item_changed(self, item):
+        print 'Position name changed from', item._text, 'to', item.text()
+        self.position_renamed.emit(item)
+
+    def on_motion_stop_pressed(self):
+        self._clear_playback_marker()
+        self._motion_publisher.stop_motion()
 
     def save_settings(self, plugin_settings, instance_settings):
         instance_settings.set_value('splitter', self.splitter.saveState())
@@ -181,20 +191,9 @@ class MotionEditorWidget(QWidget):
                 item._data = position
                 item._text = name
                 item._type = group_type
+                item.setFlags(item.flags() | Qt.ItemIsEditable)
                 list_widget.addItem(item)
         self._apply_filter_to_position_lists()
-
-    def arm_positions_list_context_menu(self, pos):
-        self.positions_list_context_menu('arm', pos)
-
-    def leg_positions_list_context_menu(self, pos):
-        self.positions_list_context_menu('leg', pos)
-
-    def torso_positions_list_context_menu(self, pos):
-        self.positions_list_context_menu('torso', pos)
-        
-    def head_positions_list_context_menu(self, pos):
-        self.positions_list_context_menu('head', pos)
 
     def positions_list_context_menu(self, group_type, pos):
         list_widget = self.list_widgets[group_type]
@@ -206,13 +205,16 @@ class MotionEditorWidget(QWidget):
         move_to = {}
         for group in self.robot_config.group_list():
             if list_item._type == group.group_type:
-                move_to[menu.addAction('move "%s"' % group.name)] = group.name
+                move_to[menu.addAction('move "%s"' % group.name)] = [group.name]
+        # move_to[menu.addAction('move all')] = list(move_to.itervalues())
+        move_to[menu.addAction('move all')] = [group_list[0] for group_list in list(move_to.itervalues())]
         result = menu.exec_(list_widget.mapToGlobal(pos))
         if result in move_to:
-            group_name = move_to[result]
-            target_positions = self.robot_config.groups[group_name].adapt_to_side(list_item._data)
-            self._motion_publisher.move_to_position(group_name, target_positions, self.time_factor_spin.value())
-            print '[Motion Editor] Moving %s to: %s' % (group_name, target_positions)
+            group_names = move_to[result]
+            for group_name in group_names:
+                target_positions = self.robot_config.groups[group_name].adapt_to_side(list_item._data)
+                self._motion_publisher.move_to_position(group_name, target_positions, self.time_factor_spin.value())
+                print '[Motion Editor] Moving %s to: %s' % (group_name, target_positions)
 
     def get_motion_from_timeline(self):
         motion = {}

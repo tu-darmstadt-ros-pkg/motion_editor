@@ -40,6 +40,7 @@ class MotionEditorPlugin(Plugin):
         position_editor = PositionEditorWidget(input_output_selector, config_loader.robot_config)
         position_editor.position_list_updated.connect(self._motion_editor.update_positions_lists)
         position_editor.position_list_updated.emit(position_editor._position_data)
+        self._motion_editor.position_renamed.connect(position_editor.on_position_renamed)
 
         layout = QVBoxLayout()
         layout.addWidget(input_output_selector)

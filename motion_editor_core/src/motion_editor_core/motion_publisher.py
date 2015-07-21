@@ -3,6 +3,9 @@ roslib.load_manifest('motion_editor_core')
 
 import rospy
 
+import actionlib
+from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
+
 from sensor_msgs.msg import JointState
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
@@ -17,8 +20,10 @@ class MotionPublisher(object):
         self.robot_config = robot_config
 
         self._trajectory_publishers = {}
+        self._traj_finished = dict()
         for group in self.robot_config.group_list():
             self._trajectory_publishers[group.name] = TrajectoryPublisher(group, publisher_prefix)
+            self._traj_finished[group.name] = (True, 0)
 
     def move_to_position(self, appendix_name, target_position, duration=1.0):
         target_pos = {
@@ -30,18 +35,26 @@ class MotionPublisher(object):
         motion = {appendix_name: [target_pos]}
         self.publish_motion(motion)
 
-    def publish_motion(self, motion, time_factor=1.0):
+    def publish_motion(self, motion, time_factor=1.0, cb_func=None):
         for group in self.robot_config.group_list():
             motion_list = motion.get(group.name, [])
             current_positions = self.get_current_positions(group)
             if len(motion_list) > 0 and current_positions is not None:
-                self._trajectory_publishers[group.name].publish_trajectory(current_positions, motion_list, time_factor=time_factor)
+                self._traj_finished[group.name] = (False, 0)
+                self._trajectory_publishers[group.name].publish_trajectory(
+                    current_positions, motion_list, time_factor=time_factor,
+                    cb_func=(lambda error_code, group_name=group.name: self.trajectory_finished(group_name, error_code, cb_func)))
+
+    def stop_motion(self):
+        print '[MotionEditor] Stop motion requested.'
+        for group_name in self.robot_config.groups:
+            self._trajectory_publishers[group_name].stop_trajectory()
 
     def get_current_positions(self, group):
         try:
             joint_ids = [self._joint_state.name.index(joint_name) for joint_name in group.joints_sorted()]
         except ValueError as e:
-            print '[Motion Editor] Error: Some joint was not found in received joint state:\n%s' % e
+            print '[MotionEditor] Error: Some joint was not found in received joint state:\n%s' % e
             return None
         current_positions = [round(self._joint_state.position[joint_id], self._precision) for joint_id in joint_ids]
         return current_positions
@@ -54,6 +67,11 @@ class MotionPublisher(object):
             self._trajectory_publishers[group_name].shutdown()
         self._state_subscriber.unregister()
 
+    def trajectory_finished(self, group_name, error_code, cb_func):
+        self._traj_finished[group_name] = (True, error_code)
+        if cb_func is not None and len([group for group in self._traj_finished.itervalues() if group[0] is False]) == 0:
+            cb_func([group[1] for group in self._traj_finished.itervalues()], list(self._traj_finished.iterkeys()))
+
 
 class TrajectoryPublisher(object):
 
@@ -61,8 +79,15 @@ class TrajectoryPublisher(object):
         self._group = group
         self._trajectory = JointTrajectory()
         self._publisher_prefix = publisher_prefix
-        self._publisher = rospy.Publisher('%s/%s' % (self._publisher_prefix, self._group.topic), JointTrajectory, queue_size=1000)
-        print '[Motion Editor] Publishing to topic:', '%s/%s' % (self._publisher_prefix, self._group.topic)
+        self._publisher = rospy.Publisher('%s/%s/command' % (self._publisher_prefix, self._group.topic), JointTrajectory, queue_size=1000)
+        # print '[Motion Editor] Publishing to topic:', '%s/%s' % (self._publisher_prefix, self._group.topic)
+        self._client = actionlib.SimpleActionClient('%s/%s/follow_joint_trajectory' % (self._publisher_prefix, self._group.topic), FollowJointTrajectoryAction)
+        if self._client.wait_for_server(timeout=rospy.Duration(1)):
+            self._found_action_server = True
+        else:
+            self._found_action_server = False
+            rospy.logwarn('[MotionEditor] Could not contact action client for ' + self._group.name
+                          + ' on %s/%s/follow_joint_trajectory/goal' % (self._publisher_prefix, self._group.topic))
 
     def _add_point(self, time, positions):
         point = JointTrajectoryPoint()
@@ -71,7 +96,7 @@ class TrajectoryPublisher(object):
         point.time_from_start = rospy.Duration(time)
         self._trajectory.points.append(point)
 
-    def publish_trajectory(self, current_positions, motion_list, time_factor = 1.0):
+    def _build_trajectory_msg(self, current_positions, motion_list, time_factor):
         self._trajectory.header.stamp = rospy.Time.now()
         self._trajectory.header.seq += 1
         self._trajectory.joint_names = self._group.joints_sorted()
@@ -95,6 +120,22 @@ class TrajectoryPublisher(object):
             self._add_point(time, motion['positions'])
             last_motion = motion
 
+    def stop_trajectory(self):
+        self._client.cancel_all_goals()
+
+    def publish_trajectory(self, current_positions, motion_list, time_factor=1.0, cb_func=None):
+        self._build_trajectory_msg(current_positions, motion_list, time_factor)
+        if self._found_action_server:
+            self.publish_trajectory_goal(cb_func)
+        else:
+            self.publish_trajectory_msg()
+
+    def publish_trajectory_goal(self, cb_func):
+        goal = FollowJointTrajectoryGoal(trajectory=self._trajectory)
+        self._client.send_goal(goal,
+                               done_cb=(lambda state, result: cb_func(result.error_code)))
+
+    def publish_trajectory_msg(self):
         self._publisher.publish(self._trajectory)
 
     def shutdown(self):
