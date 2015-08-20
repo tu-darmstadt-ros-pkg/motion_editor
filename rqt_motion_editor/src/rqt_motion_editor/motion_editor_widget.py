@@ -214,7 +214,7 @@ class MotionEditorWidget(QWidget):
             for group_name in group_names:
                 target_positions = self.robot_config.groups[group_name].adapt_to_side(list_item._data)
                 self._motion_publisher.move_to_position(group_name, target_positions, self.time_factor_spin.value())
-                print '[Motion Editor] Moving %s to: %s' % (group_name, target_positions)
+                print '[Motion Editor] Moving %s to: %s' % (group_name, zip(self.robot_config.groups[group_name].joints_sorted(), target_positions))
 
     def get_motion_from_timeline(self):
         motion = {}
