@@ -13,7 +13,7 @@
                                              -2.1904,
                                              0.7203,
                                              -0.0],
-                              'starttime': 6.039},
+                              'starttime': 2.996},
                             { 'duration': 1.0,
                               'name': u'calibration_3',
                               'positions': [ 0.0,
@@ -21,7 +21,7 @@
                                              -2.1918,
                                              0.7203,
                                              0.314],
-                              'starttime': 11.998},
+                              'starttime': 4.993},
                             { 'duration': 1.0,
                               'name': u'calibration_4',
                               'positions': [ 0.0,
@@ -29,7 +29,7 @@
                                              -2.1334,
                                              0.7201,
                                              0.3141],
-                              'starttime': 18.036}],
+                              'starttime': 6.989}],
                    'flipper': [ { 'duration': 1.0,
                                   'name': u'flipper_down',
                                   'positions': [-0.4182, -0.4182],
@@ -37,4 +37,4 @@
                                 { 'duration': 1.0,
                                   'name': u'flipper_up',
                                   'positions': [-1.501, -1.501],
-                                  'starttime': 22.03}]}}
+                                  'starttime': 9.018}]}}
