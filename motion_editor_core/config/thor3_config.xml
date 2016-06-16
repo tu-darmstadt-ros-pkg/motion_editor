@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<config>
+	<robot name="thormang3">
+	  <group name="right_arm" type="arm" topic="right_arm_traj_controller">
+	    <joint name="r_arm_sh_p1"/>
+	    <joint name="r_arm_sh_r"/>
+	    <joint name="r_arm_sh_p2"/>
+	    <joint name="r_arm_el_y"/>
+	    <joint name="r_arm_wr_r"/>
+	    <joint name="r_arm_wr_y"/>
+	    <joint name="r_arm_wr_p"/>    
+	  </group>
+
+	  <group name="left_arm" type="arm" mirrored="true" topic="left_arm_traj_controller">
+	    <joint name="l_arm_sh_p1"/>
+	    <joint name="l_arm_sh_r"/>
+	    <joint name="l_arm_sh_p2"/>
+	    <joint name="l_arm_el_y"/>
+	    <joint name="l_arm_wr_r"/>
+	    <joint name="l_arm_wr_y"/>
+	    <joint name="l_arm_wr_p"/>  
+	  </group>
+
+    <group name="head" type="head" topic="head_traj_controller">
+      <joint name="head_p"/>
+      <joint name="head_y"/>
+    </group>
+
+    <group name="torso" type="torso" topic="torso_traj_controller">
+      <joint name="torso_y"/>
+    </group>
+
+	  <group name="right_leg" type="leg" topic="right_leg_traj_controller">
+	    <joint name="r_leg_hip_y"/>
+	    <joint name="r_leg_hip_r"/>
+	    <joint name="r_leg_hip_p"/>
+	    <joint name="r_leg_kn_p"/>
+	    <joint name="r_leg_an_p"/>
+	    <joint name="r_leg_an_r"/>  
+	  </group>
+
+	  <group name="left_leg" type="leg" mirrored="true" topic="left_leg_traj_controller">
+	    <joint name="l_leg_hip_y"/>
+	    <joint name="l_leg_hip_r"/>
+	    <joint name="l_leg_hip_p"/>
+	    <joint name="l_leg_kn_p"/>
+	    <joint name="l_leg_an_p"/>
+	    <joint name="l_leg_an_r"/>  
+	  </group>
+	</robot>
+
+	<target name="Thor3" joint_state_topic="/johnny5/joints/joint_states" publish_prefix="/johnny5/joints"/>
+</config>
