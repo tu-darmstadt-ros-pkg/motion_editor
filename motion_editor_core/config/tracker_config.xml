@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config>
+  <robot name="tracker">
+    <group name="arm" type="arm" mirrored="false" topic="arm_traj_controller">
+      <joint name="arm_joint_0"/>
+      <joint name="arm_joint_1"/>
+      <joint name="arm_joint_2"/>
+      <joint name="arm_joint_3"/>
+    </group>
+  </robot>
+  <target name="Tracker" joint_state_topic="/arm_control/joint_states" publish_prefix="/arm_control"/>
+</config>
