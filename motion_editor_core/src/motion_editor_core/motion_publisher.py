@@ -14,7 +14,7 @@ class MotionPublisher(object):
     _precision = 4
 
     def __init__(self, robot_config, joint_state_topic, publisher_prefix):
-        self._joint_state = JointState()
+        self._joint_state_dict = dict()
         self._state_subscriber = rospy.Subscriber(joint_state_topic, JointState, self._state_callback)
         print '[Motion Editor] Subscribing to', joint_state_topic
         self.robot_config = robot_config
@@ -51,16 +51,17 @@ class MotionPublisher(object):
             self._trajectory_publishers[group_name].stop_trajectory()
 
     def get_current_positions(self, group):
-        try:
-            joint_ids = [self._joint_state.name.index(joint_name) for joint_name in group.joints_sorted()]
-        except ValueError as e:
-            print '[MotionEditor] Error: Some joint was not found in received joint state:\n%s' % e
-            return None
-        current_positions = [round(self._joint_state.position[joint_id], self._precision) for joint_id in joint_ids]
+        for joint_name in group.joints_sorted():
+            if joint_name not in self._joint_state_dict:
+                print '[MotionEditor] Error: joint', joint_name, "was not found in joint state"
+                return None
+        current_positions = [round(self._joint_state_dict[joint_name], self._precision) for joint_name in group.joints_sorted()]
         return current_positions
 
     def _state_callback(self, joint_states):
-        self._joint_state = joint_states
+        for i, name in enumerate(joint_states.name):
+            self._joint_state_dict[name] = joint_states.position[i]
+
 
     def shutdown(self):
         for group_name in self.robot_config.groups:
