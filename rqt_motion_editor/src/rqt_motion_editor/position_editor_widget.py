@@ -4,7 +4,7 @@ roslib.load_manifest('rqt_motion_editor')
 import os
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import Signal, Slot
-from python_qt_binding.QtGui import QWidget, QMessageBox
+from python_qt_binding.QtWidgets import QWidget, QMessageBox
 
 from motion_editor_core.position_data import PositionData
 

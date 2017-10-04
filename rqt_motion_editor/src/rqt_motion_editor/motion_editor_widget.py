@@ -5,7 +5,8 @@ import os
 import re
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import Slot, QTimer, Qt, Signal
-from python_qt_binding.QtGui import QApplication, QWidget, QListWidgetItem, QMessageBox, QMenu, QLabel, QListWidget, QAbstractItemView, QPalette, QColor
+from python_qt_binding.QtWidgets import QApplication, QWidget, QListWidgetItem, QMessageBox, QMenu, QLabel, QListWidget, QAbstractItemView
+from python_qt_binding.QtGui import QPalette, QColor
 
 from motion_editor_core.motion_data import MotionData
 from timeline_widget import TimelineWidget

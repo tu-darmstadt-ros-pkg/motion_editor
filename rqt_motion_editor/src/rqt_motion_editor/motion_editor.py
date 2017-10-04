@@ -1,10 +1,8 @@
-import roslib
-roslib.load_manifest('rqt_motion_editor')
 import rospy
 
 from rqt_gui_py.plugin import Plugin
 from python_qt_binding.QtCore import Signal
-from python_qt_binding.QtGui import QWidget, QVBoxLayout
+from python_qt_binding.QtWidgets import QWidget, QVBoxLayout
 
 from motion_editor_core.motion_publisher import MotionPublisher
 

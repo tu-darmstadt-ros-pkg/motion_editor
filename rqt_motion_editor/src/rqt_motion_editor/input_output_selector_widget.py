@@ -3,7 +3,7 @@ roslib.load_manifest('rqt_motion_editor')
 
 import os
 from python_qt_binding import loadUi
-from python_qt_binding.QtGui import QWidget, QRadioButton
+from python_qt_binding.QtWidgets import QWidget, QRadioButton
 
 
 class InputOutputSelectorWidget(QWidget):

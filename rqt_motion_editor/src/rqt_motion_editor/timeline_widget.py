@@ -1,8 +1,9 @@
 import os
 from python_qt_binding import loadUi
 from python_qt_binding.QtCore import Qt, QPointF
-from python_qt_binding.QtGui import QWidget, QColor, QBrush, QGraphicsItem, QGraphicsRectItem, QGraphicsScene, \
-    QGraphicsSimpleTextItem, QGraphicsView, QFont, QMenu, QPen, QLabel, QGraphicsLineItem, QWheelEvent
+from python_qt_binding.QtWidgets import QWidget, QGraphicsItem, QGraphicsRectItem, QGraphicsScene, \
+    QGraphicsSimpleTextItem, QGraphicsView, QMenu, QLabel, QGraphicsLineItem
+from python_qt_binding.QtGui import QFont, QColor, QBrush, QPen, QWheelEvent
 
 
 class TimelineClip(QGraphicsRectItem):
@@ -12,7 +13,8 @@ class TimelineClip(QGraphicsRectItem):
 
     def __init__(self, track, text, starttime, duration):
         self._track = track
-        super(TimelineClip, self).__init__(0.0, 0.0, duration, track.height, None, track.scene())
+        super(TimelineClip, self).__init__(0.0, 0.0, duration, track.height, None)
+        track.scene().addItem(self)
         self.setFlag(QGraphicsItem.ItemSendsScenePositionChanges)
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setZValue(self._z)
@@ -150,7 +152,8 @@ class TimelineTrack(QGraphicsRectItem):
 
     def __init__(self, scene, track_name, track_type, track_number, color=None):
         self._y = track_number * self.height
-        super(TimelineTrack, self).__init__(self.starttime, self._y, self.length, self.height, None, scene)
+        super(TimelineTrack, self).__init__(self.starttime, self._y, self.length, self.height, None)
+        scene.addItem(self)
         self._name = track_name
         self._type = track_type
 
@@ -166,7 +169,6 @@ class TimelineTrack(QGraphicsRectItem):
 
         self.setBrush(QBrush(self._colors['track']))
         self.setPen(QPen(Qt.NoPen))
-
 
     def contextMenuEvent(self, event):
         menu = QMenu()
@@ -188,25 +190,20 @@ class TimelineTrack(QGraphicsRectItem):
             for clip in self.clips():
                 destination_track.add_clip(clip.text(), clip.starttime(), clip.duration(), clip.data())
 
-
     def clear(self):
         for clip in self.clips():
             clip.remove()
 
-
     def name(self):
         return self._name
 
-
     def track_type(self):
         return self._type
-
 
     def add_clip(self, text, starttime, duration, data={}):
         clip = TimelineClip(self, text, starttime, duration)
         clip.set_data(data)
         return clip
-
 
     def clips(self):
         clips = []
@@ -215,7 +212,6 @@ class TimelineTrack(QGraphicsRectItem):
                 clips.append(item)
         return sorted(clips, key=lambda clip: clip.starttime())
 
-
     def previous_clip(self, time):
         clips = self.clips()
         clips.reverse()
@@ -223,12 +219,10 @@ class TimelineTrack(QGraphicsRectItem):
             if clip.starttime() <= time:
                 return clip
 
-
     def next_clip(self, time):
         for clip in self.clips():
             if clip.starttime() > time:
                 return clip
-
 
     def clip_at(self, time):
         previous_clip = self.previous_clip(time)
@@ -250,11 +244,9 @@ class TimelineMarker(QGraphicsLineItem):
         color.setAlphaF(0.5)
         self.setPen(QPen(QBrush(color), 0.05))
 
-
     def set_time(self, time):
         self.setPos(time, 0.0)
         self.ensureVisible()
-
 
     def remove(self):
         if self.scene() is not None:
@@ -275,11 +267,9 @@ class TimelineScene(QGraphicsScene):
             self.add_time_marker(time)
         self.calculate_scene_rect()
 
-
     def calculate_scene_rect(self):
         height = (len(self._tracks) + 1) * TimelineTrack.height
         self.setSceneRect(TimelineTrack.starttime, - TimelineTrack.height, TimelineTrack.length, height)
-
 
     def add_label(self, text, x, y):
         text = self.addSimpleText(text)
@@ -289,21 +279,19 @@ class TimelineScene(QGraphicsScene):
         text.setZValue(self._time_z)
         text.setFlag(QGraphicsItem.ItemIgnoresTransformations)
 
-
     def add_time_marker(self, time):
         line = self.addLine(time, - TimelineTrack.height, time, TimelineTrack.height * 7)
         line.setPen(QPen(QColor(150, 150, 150)))
         line.setZValue(self._time_z)
         self.add_label('%.0fs' % time, time + 0.05, self._time_y)
 
-
     def add_track(self, track_name, track_type):
         track_number = len(self._tracks)
+        print "adding track", track_name
         self._tracks[track_name] = TimelineTrack(self, track_name, track_type, track_number)
         self._track_list.append(self._tracks[track_name])
         self.calculate_scene_rect()
         return self._tracks[track_name]
-
 
     def add_clip(self, track_name, text, starttime, duration, data={}):
         return self._tracks[track_name].add_clip(text, starttime, duration, data)
@@ -434,24 +422,36 @@ class TimelineView(QGraphicsView):
     def wheelEvent(self, event):
         # create a wheel event with a delta value scaled to the current zoom level
         visible_duration = self.mapToScene(self.viewport().geometry()).boundingRect().width()
-        scaled_delta = round(event.delta() * visible_duration)
-        # ensure the delta is not being scaled down to 0
-        if event.delta() > 0:
-            scaled_delta = max(1, int(scaled_delta))
-        else:
-            scaled_delta = min(-1, int(scaled_delta))
-        scaled_event = QWheelEvent(event.pos(), event.globalPos(), scaled_delta, event.buttons(), event.modifiers(), event.orientation())
+        # pixel_point = event.pixelDelta()
+        # pixel_delta = pixel_point.x()
+        # scaled_pixel_delta = round(pixel_delta * visible_duration)
+        # # ensure the delta is not being scaled down to 0
+        # if pixel_delta > 0:
+        #     scaled_pixel_delta = max(1, int(scaled_pixel_delta))
+        # else:
+        #     scaled_pixel_delta = min(-1, int(scaled_pixel_delta))
+        # angle_point = event.pixelDelta()
+        # angle_delta = pixel_point.x()
+        # scaled_angle_delta = round(angle_delta * visible_duration)
+        # # ensure the delta is not being scaled down to 0
+        # if angle_delta > 0:
+        #     scaled_angle_delta = max(1, int(scaled_angle_delta))
+        # else:
+        #     scaled_angle_delta = min(-1, int(scaled_angle_delta))
+        # scaled_event = QWheelEvent(event.pos(), event.globalPos(), scaled_pixel_delta, scaled_angle_delta,
+        #                            event.orientation(), event.buttons(), event.modifiers. event.phase, event.source,
+        #                            event.inverted)
 
         # let scene items handle this event, if they like
-        super(TimelineView, self).wheelEvent(scaled_event)
-        if scaled_event.isAccepted():
+        super(TimelineView, self).wheelEvent(event)
+        if event.isAccepted():
             return
 
         # handle the wheel event by zooming
         mouse_pos_before = self.mapToScene(event.pos())
 
         # zoom only x/time axis
-        steps = event.delta() / 120.0
+        steps = event.angleDelta().x() / 120.0
         self.scale(1.2 ** steps, 1.0)
 
         mouse_pos_after = self.mapToScene(event.pos())
