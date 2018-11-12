@@ -237,7 +237,7 @@ class TimelineMarker(QGraphicsLineItem):
 
     def __init__(self, scene, time, color=None):
         y2 = len(scene._tracks) * TimelineTrack.height
-        super(TimelineMarker, self).__init__(time, - TimelineTrack.height, time, y2, None, scene)
+        super(TimelineMarker, self).__init__(time, - TimelineTrack.height, time, y2, None)
         self.setZValue(self._z)
         if color is None:
             color = QColor(self._default_color)
