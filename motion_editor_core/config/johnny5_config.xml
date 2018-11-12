@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <config>
-	<robot name="thormang3">
+	<robot name="johnny5">
 	  <group name="right_arm" type="arm" topic="right_arm_traj_controller">
 	    <joint name="r_arm_sh_p1"/>
 	    <joint name="r_arm_sh_r"/>
@@ -49,5 +49,5 @@
 	  </group>
 	</robot>
 
-	<target name="Thor3" joint_state_topic="/johnny5/joints/joint_states" publish_prefix="/johnny5/joints"/>
+	<target name="johnny5" joint_state_topic="/johnny5/joints/joint_states" publish_prefix="/johnny5/joints"/>
 </config>
