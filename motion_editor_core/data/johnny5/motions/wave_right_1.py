@@ -2,7 +2,7 @@
                        'left_arm': [],
                        'left_leg': [],
                        'right_arm': [ { 'duration': 2.185,
-                                        'name': u'handshake',
+                                        'name': u'wave_right_1',
                                         'positions': [ 1.57,
                                                        0.00,
                                                        0.00,
@@ -14,18 +14,3 @@
                        'right_leg': [],
                        'torso': []}}
 
-#{ 'wave_right_2': { 'head': [],
-#                       'left_arm': [],
-#                       'left_leg': [],
-#                       'right_arm': [ { 'duration': 2.185,
-#                                        'name': u'handshake',
-#                                        'positions': [ 1.57,
-#                                                       0.00,
-#                                                       0.00,
-#                                                       0.00,
-#                                                       -1.57,
-#                                                       0.00,
-#                                                       0.60],
-#                                        'starttime': 0.0}],
-#                       'right_leg': [],
-#                       'torso': []}}

@@ -1,6 +1,6 @@
 { 'wave_left_2': { 'head': [],
                       'left_arm': [ { 'duration': 2.185,
-                                      'name': u'handshake',
+                                      'name': u'wave_left_2',
                                       'positions': [ -1.57,
                                                      0.00,
                                                      0.00,

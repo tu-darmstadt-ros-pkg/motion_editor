@@ -2,7 +2,7 @@
                        'left_arm': [],
                        'left_leg': [],
                        'right_arm': [ { 'duration': 2.185,
-                                        'name': u'handshake',
+                                        'name': u'wave_right_2',
                                         'positions': [ 1.57,
                                                        0.00,
                                                        0.00,
