@@ -1,4 +1,7 @@
-{ 'show_eyes': { 'head': [],
+{ 'show_eyes': { 'head': [ { 'duration': 1.894,
+                             'name': u'show_eyes',
+                             'positions': [0.2394, -0.5027],
+                             'starttime': 0.016}],
                  'left_arm': [],
                  'left_leg': [],
                  'right_arm': [ { 'duration': 3.203,

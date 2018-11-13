@@ -1,4 +1,7 @@
-{ 'show_height': { 'head': [],
+{ 'show_height': { 'head': [ { 'duration': 2.298,
+                               'name': u'show_height',
+                               'positions': [-0.1642, -1.0053],
+                               'starttime': 0.0}],
                    'left_arm': [],
                    'left_leg': [],
                    'right_arm': [ { 'duration': 2.262,

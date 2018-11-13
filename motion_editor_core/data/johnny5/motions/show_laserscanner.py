@@ -1,4 +1,7 @@
-{ 'show_laserscanner': { 'head': [],
+{ 'show_laserscanner': { 'head': [ { 'duration': 1.75,
+                                     'name': u'ready_state',
+                                     'positions': [0.4016, -0.0],
+                                     'starttime': 0.0}],
                          'left_arm': [ { 'duration': 2.181,
                                          'name': u'show_world_1',
                                          'positions': [ 0.0445,

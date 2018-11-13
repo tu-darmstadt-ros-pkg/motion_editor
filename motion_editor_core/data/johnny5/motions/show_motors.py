@@ -1,4 +1,7 @@
-{ 'show_motors': { 'head': [],
+{ 'show_motors': { 'head': [ { 'duration': 3.28,
+                               'name': u'show_motors',
+                               'positions': [0.4338, 0.0],
+                               'starttime': 0.958}],
                    'left_arm': [],
                    'left_leg': [],
                    'right_arm': [ { 'duration': 2.257,
