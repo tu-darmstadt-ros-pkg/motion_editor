@@ -1,4 +1,7 @@
-{ 'ready_state': { 'head': [],
+{ 'ready_state': { 'head': [ { 'duration': 1.0,
+                               'name': u'ready_state',
+                               'positions': [0.4016, -0.0],
+                               'starttime': 0.0}],
                    'left_arm': [ { 'duration': 2.225,
                                    'name': u'ready_state',
                                    'positions': [ 0.4364,
