@@ -1,6 +1,6 @@
-{ 'show_body_height': { 'head': [ { 'duration': 2.199,
+{ 'show_body_height': { 'head': [ { 'duration': 1.49,
                                     'name': u'show_body_height',
-                                    'positions': [-0.0745, -0.3456],
+                                    'positions': [-0.0446, 0.6283],
                                     'starttime': 0.0}],
                         'left_arm': [ { 'duration': 2.21,
                                         'name': u'show_body_height',

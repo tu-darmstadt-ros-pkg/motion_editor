@@ -1,4 +1,7 @@
-{ 'show_computers': { 'head': [],
+{ 'show_computers': { 'head': [ { 'duration': 1.285,
+                                  'name': u'head_up',
+                                  'positions': [-0.0499, -0.0],
+                                  'starttime': 0.0}],
                       'left_arm': [ { 'duration': 2.322,
                                       'name': u'show_computers_1',
                                       'positions': [ -0.6601,

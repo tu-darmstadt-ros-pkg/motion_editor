@@ -1,6 +1,6 @@
-{ 'show_fingers': { 'head': [ { 'duration': 1.421,
+{ 'show_fingers': { 'head': [ { 'duration': 1.415,
                                 'name': u'show_fingers',
-                                'positions': [0.5682, 0.5341],
+                                'positions': [0.572, 0.4398],
                                 'starttime': 0.0}],
                     'left_arm': [ { 'duration': 2.07,
                                     'name': u'show_fingers',
